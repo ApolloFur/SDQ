@@ -1,11 +1,11 @@
 import random
-#include name, ID, roomID, position, HP, MP, SPD, STR, CON, INT, initiative
-player = ["Player",0,0,[0,0],[100,100],[100,100],[4,-4],[6,6],[5,5],[6,6],0]
+#include name, ID, roomID, position, HP, MP, SPD, STR, CON, INT, PER, initiative
+player = ["Placeholder",0,0,[0,0],[100,100],[100,100],[5,-5],[6,6],[5,5],[6,6],[6,6],0]
 #include name, id, number
-playerInv = {1: ["sword",1],2: ["crossbow",1],3: ["HPotion",5],4: ["MPotion",5],5: ["STRPotion",0],6: ["CONPotion",1],7: ["INTPotion",0],8: ["bolts",30],9: ["BossKey",0],10: ["ExitKey",0]}
+playerInv = {1: ["sword",1],2: ["crossbow",1],3: ["HPotion",5],4: ["MPotion",5],5: ["STRPotion",0],6: ["CONPotion",1],7: ["INTPotion",0],8: ["bolts",30],9: ["BossKey",0],10: ["ExitKey",0],11: ["PERPotion",0]}
 #include name, minheight, maxheight, minwidth, maxwidth, whether it has been entered
 ROOMS = {
-0: ["WestWall",-11,5,-1,3,0,"A large wall that sprawl for miles stands beore you. It's crooked, mossy bricks barely holding together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work."],
+0: ["WestWall",-11,5,-1,3,0,"A large wall that sprawls for miles stands beore you. It's crooked, mossy bricks barely held together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work."],
 1: ["NorthWall",-2,2,-5,5,0,"The wall makes a sharp 90 degree turn and you see a large pile of rubble. At the top, a single door that you couldn't hope of reaching this low."],
 2: ["Courtyard1",-5,5,-12,10,0,"A large field of dead grass stand before you, as undead creatures patrol around the castle grounds. A tree stand in the middle, along with other small peices of dead shrubbery."],
 3: ["Courtyard2",-6,8,-6,8,0,"The courtyard continues even further. It looks identical to the previous field."],
@@ -35,7 +35,7 @@ ROOMS = {
 PORTALS = (
 ("More of this wall stretches on this side",0,1,(3,4),(0,-5),(0,0),(0,0)),
 ("A large entrance to the castle",0,2,(3,6),(-12,3),(0,0),(0,0)),
-("A broken cover",0,4,(3,-9),(0,0),(0,0)),
+("A broken vent cover",0,4,(3,-9),(0,0),(0,0)),
 ("A third cell door that connects to a hallway on the left",4,10,(2,0),(-2,1),(0,0),(0,0)),
 ("A third cell door that connects to a hallway on the right",5,10,(-1,0),(2,1),(0,0),(0,0)),
 ("A second cell door that connect to a hallway on the left",6,10,(2,0),(-2,-2),(0,0),(0,0)),
@@ -60,22 +60,77 @@ PORTALS = (
 ("A pile of rubble that leads to the north wall",23,1,(-5,0),(5,0),(0,0),(1,1)),
 ("A road that leads to the nearby town",0,24,(-1,3),(6,0),(1,10),(1,0))
 )
-#include id, number, room id, location, whether they have been picked up
-PICKUPS = (
-[3,1,1,(3,0),0]
+#include item id, number, room id, location, whether they have been picked up
+pickups = (
+[3,1,1,(3,0),0],
+[5,1,8,(1,1),0],
+[6,1,13,(-1,-4),0],
+[8,20,12,(1,-1),0],
+[7,2,18,(4,-5),0],
+[5,1,20,(-1,-4),0],
+[11,1,3,(-1,-4),0]
 )
+
+def PortalFun(num):
+	if PORTALS[n][num] == player[2]:
+		availablePortals.append(PORTALS[n])
+
+def AvailablePortalDisplay(num, brea):
+	for n in range(len(availablePortals)):
+		if availablePortals[n][num] == player[2]:
+			print(f"{availablePortals[n][0]} at {availablePortals[n][3]}")
+			if brea == 1:
+				break
+
+
+def AvailablePickupDisplay(message, brea):
+	for n in range(len(availablePickups)):
+		if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
+			print(message)
+			if brea == 1:
+				break
+
+def PortalMove(num, num2):
+	if playerX == availablePortals[n][num2][0] and playerY == availablePortals[n][num2][1]:
+		if availablePortals[n][5][0] == 0 or (availablePortals[n][5][0] == 1 and playerInv[availablePortals[n][5][1]] > 0):
+			if availablePortals[n][6][0] == 0 or (availablePortals[n][6][0] == 1 and player[2] != availablePortals[n][6][1]):
+				print(f"you have successfully left {ROOMS[player[2]][0]}")
+				player[2] = availablePortals[n][num]
+				player[3][0] = availablePortals[n][num2][0]
+				player[3][1] = availablePortals[n][num2][1]
+				print(f"you are now in {ROOMS[player[2]][0]}")
 
 MOVE = ("move","1","m")
 INTERACT = ("interact","3","inter")
 ENTER = ("enter","4","ent","e")
 INV = ("inventory","2","inv")
 USE = ("use","1","u")
-DROP = ("drop","2","d")
-QUIT = ("quit","3","q")
+QUIT = ("quit","2","q")
+NEW = ("new","n","1")
+LOAD = ("load","l","2")
+DELETE = ("delete","del","d","3")
 
-print("\n\tWelcome to Super Dungeon Quest!")
+inTitle = 1
+while inTitle == 1:
+	print('''\n\tWelcome to Super Dungeon Quest!
+Please select an option:
+1. New Game
+2. Load Game
+3. Delete file
+''')
+	choice = input("")
 
-inGame = 1
+	if choice in NEW:
+		name = input("\nPlease enter a file name\n")
+		player[0] = name
+		inTitle = 0
+		inGame = 1
+	elif choice in LOAD:
+		pass
+	elif choice in DELETE:
+		pass
+
+
 while inGame == 1:
 	playerX, playerY = player[3]
 	playerSpdMax, playerSpdMin = player[6]
@@ -88,38 +143,39 @@ while inGame == 1:
 	ROOMMAXW = ROOMS[player[2]][4]
 	availablePortals = []
 	for n in range(len(PORTALS)):
-		if PORTALS[n][1] == player[2]:
-			availablePortals.append(PORTALS[n])
-		if PORTALS[n][2] == player[2]:
-			availablePortals.append(PORTALS[n])
+		PortalFun(1)
+		PortalFun(2)
 	availablePickups = []
-	for n in range(len(PICKUPS)):
-		if PICKUPS[n][2] == player[2]:
-			availablePickups.append(PICKUPS[n])
+	for n in range(len(pickups)):
+		if pickups[n][2] == player[2]:
+			if pickups[n][4] == 0:
+				availablePickups.append(pickups[n])
 
-	print(f"""\n\n{player[0]}
+	print(f"""\n\nPlayer: {player[0]}
+
 Your status is:
 	HP: {player[4][1]}/{player[4][0]}
 	MP: {player[5][1]}/{player[5][0]}
-
 	current position:{playerX},{playerY}
-	current room: {ROOMS[player[2]][0]}
-	you see:""")
-	for n in range(len(availablePortals)):
-		if availablePortals[n][1] == player[2]:
-			print(f"{availablePortals[n][0]} at {availablePortals[n][3]}")
-		if availablePortals[n][2] == player[2]:
-			print(f"{availablePortals[n][0]} at {availablePortals[n][4]}")
+	current room: {ROOMS[player[2]][0]}\n""")
+	if ROOMS[player[2]][5] == 0:
+		print(ROOMS[player[2]][6])
+		ROOMS[player[2]][5] = 1
+	print("\nyou see:")
+
+	AvailablePortalDisplay(1, 0)
+	AvailablePortalDisplay(2, 0)
+
 	for n in range(len(availablePickups)):
-		if playerX >= availablePickups[n][3][0]-4 and playerX <= availablePickups[n][3][0]+4 and playerY >= availablePickups[n][3][1]-4 and playerY <= availablePickups[n][3][1]+4:
-			print(f"{playerInv[n][0]} at {availablePickups[n][3]}")
+		if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
+			print(f"{playerInv[availablePickups[n][0]][0]} at {availablePickups[n][3]}")
+			break
+
 	print("""\nplease pick an option:
 	1. move
 	2. inventory""")
-	for n in range(len(availablePickups)):
-		if playerX >= availablePickups[n][3][0]-4 and playerX <= availablePickups[n][3][0]+4 and playerY >= availablePickups[n][3][1]-4 and playerY <= availablePickups[n][3][1]+4:
-			print("\t3. interact")
-			break
+	AvailablePickupDisplay("\t3. interact", 1)
+
 	for n in range(len(availablePortals)):
 		if (playerX == availablePortals[n][3][0] and playerY == availablePortals[n][3][1]) or (playerX == availablePortals[n][4][0] and playerY == availablePortals[n][4][1]):
 			print("\t4. enter")
@@ -159,41 +215,41 @@ Your status is:
 						player[3][1] = playerY
 					print(f"done! You are now at {playerX},{playerY}")
 					playerTurn = 0
+
 	elif chosen in INV:
 		inInventory = 1
 		while inInventory == 1:
-			print("you have:\n[item name, item ID, number of item]")
+			print("you have:\n[item name, number of item]\n")
+			INVKEYS = list(playerInv.keys())
 			for n in range(len(playerInv)):
-				if playerInv[n][1] > 0:
-					print(f"{playerInv[n]}")
+				if playerInv[n+1][1] > 0:
+					print(f"{playerInv[n+1]}: Item ID {INVKEYS[n]}")
 			print("""what would you like to do?
 		1. use
-		2. drop
-		3. quit""")
+		2. quit""")
 			chosen = input("")
 
 			if chosen in USE:
-				chosen = input("what would you like to use?\n(type the item id)\n")
+				chosen = input("what would you like to use?\n(type the item ID)\n")
 				playerInv[chosen][1] -= 1
 			elif chosen in QUIT:
 				inInventory = 0
 	elif chosen in INTERACT:
 		for n in range(len(availablePickups)):
-			if playerX >= availablePickups[n][3][0]-3 and playerX <= availablePickups[n][3][0]+3 and playerY >= availablePickups[n][3][1]-3 and playerY <= availablePickups[n][3][1]+3:
-				playerInv[availablePickups[0]][1] += availablePickups[1]
+			if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
+				playerInv[availablePickups[n][0]][1] += availablePickups[n][1]
+				for m in range(len(pickups)):
+					if pickups[m] == availablePickups[n]:
+						pickups[m][4] = 1
+
 	elif chosen in ENTER:
+		currentRoom = player[2]
 		for n in range(len(availablePortals)):
-			if playerX == availablePortals[n][3][0] and playerY == availablePortals[n][3][1]:
-				print(f"you have successfully left {ROOMS[player[2]][0]}")
-				player[2] = availablePortals[n][2]
-				player[3][0] = availablePortals[n][4][0]
-				player[3][1] = availablePortals[n][4][1]
-				print(f"you are now in {ROOMS[player[2]][0]}")
-				break
-			elif playerX == availablePortals[n][3][0] and playerY == availablePortals[n][3][1]:
-				print(f"you have successfully left {ROOMS[player[2]][0]}")
-				player[2] = availablePortals[n][1]
-				player[3][0] = availablePortals[n][4][0]
-				player[3][1] = availablePortals[n][4][1]
-				print(f"you are now in {ROOMS[player[2]][0]}")
-				break
+			PortalMove(1,4)
+			if currentRoom == player[2]:
+				PortalMove(2,3)
+			if currentRoom == player[2]:
+				PortalMove(1,3)
+			if currentRoom == player[2]:
+				PortalMove(2,4)
+			break
