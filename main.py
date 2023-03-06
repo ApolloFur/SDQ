@@ -3,6 +3,7 @@ import random
 player = ["Placeholder",0,0,[0,0],[100,100],[100,100],[5,-5],[6,6],[5,5],[6,6],[6,6],0]
 #include name, id, number
 playerInv = {1: ["sword",1],2: ["crossbow",1],3: ["HPotion",5],4: ["MPotion",5],5: ["STRPotion",0],6: ["CONPotion",1],7: ["INTPotion",0],8: ["bolts",30],9: ["BossKey",0],10: ["ExitKey",0],11: ["PERPotion",0]}
+playerSpells = ()
 #include name, minheight, maxheight, minwidth, maxwidth, whether it has been entered
 ROOMS = {
 0: ["WestWall",-11,5,-1,3,0,"A large wall that sprawls for miles stands beore you. It's crooked, mossy bricks barely held together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work."],
@@ -71,6 +72,71 @@ pickups = (
 [11,1,3,(-1,-4),0]
 )
 
+#include ID, name, AI type, location, HP, MP, SPD, STR, CON, INT, PER, initiative, what item it may drop and how much
+enemies = {
+	1: ["SkeletonGuard1",0,[random.randint(-10,8),random.randint(-4,4)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	2: ["SkeletonGuard2",0,[random.randint(-10,8),random.randint(-4,4)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+
+	3: ["SkeletonGuard1",0,[random.randint(-5,7),random.randint(-5,7)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	4: ["SkeletonGuard2",0,[random.randint(-5,7),random.randint(-5,7)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	5: ["SkeletonArcher",1,[random.randint(-5,7),random.randint(-5,7)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+
+	6: ["SkeletonGuard",0,[random.randint(-4,4),random.randint(-4,4)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	7: ["SkeletonArcher",1,[random.randint(-4,4),random.randint(-4,4)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	8: ["Spider",2,[random.randint(-4,4),random.randint(-4,4)],40,0,(2,-2),7,5,1,3,random.randint(1,20)],
+
+	9: ["Spider1",2,[random.randint(-3,4),random.randint(-2,3)],40,0,(2,-2),7,5,1,3,random.randint(1,20)],
+	10: ["Spider2",2,[random.randint(-3,4),random.randint(-2,3)],40,0,(2,-2),7,5,1,3,random.randint(1,20)],
+	11: ["SkeletonArcher",1,[random.randint(-3,4),random.randint(-2,3)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	12: ["GiantZombieBat",3,[0,0],60,30,(5,-5),8,8,4,6,random.randint(1,20)],
+
+	13: ["SkeletonGuard",0,[random.randint(-5,6),random.randint(-13,-2)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	14: ["Spider",2,[random.randint(-5,6),random.randint(-13,-2)],40,0,(2,-2),7,5,1,3,random.randint(1,20)],
+	15: ["SkeletonArcher1",1,[random.randint(-5,6),random.randint(-13,-2)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	16: ["SkeletonArcher2",1,[random.randint(-5,6),random.randint(-13,-2)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+
+	17: ["SkeletonArcher1",1,[random.randint(-5,6),random.randint(2,13)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	18: ["SkeletonArcher2",1,[random.randint(-5,6),random.randint(2,13)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	19: ["PossessedArmor",4,[random.randint(-5,6),random.randint(2,13)],40,40,(3,-3),6,4,6,3,random.randint(1,20)],
+
+	20: ["SkeletonArcher",1,[random.randint(-5,5),random.randint(-5,5)],20,30,(4,-4),3,6,5,6,random.randint(1,20)],
+	21: ["SkeletonGuard",0,[random.randint(-5,5),random.randint(-5,5)],30,20,(3,-3),5,6,4,5,random.randint(1,20)],
+	22: ["PossessedArmor1",4,[random.randint(-5,5),random.randint(-5,5)],40,40,(3,-3),6,4,6,3,random.randint(1,20)],
+	23: ["PossessedArmor2",4,[random.randint(-5,5),random.randint(-5,5)],40,40,(3,-3),6,4,6,3,random.randint(1,20)],
+
+	24: ["PossessedArmor",4,[random.randint(-8,8),random.randint(-6,7)],40,40,(3,-3),6,4,6,3,random.randint(1,20)],
+	25: ["EnchantedSword",5,[random.randint(-8,8),random.randint(-6,7)],30,40,(4,-4),5,4,7,4,random.randint(1,20)],
+	26: ["LichKing",6,[0,0],80,50,(4,-4),4,7,8,5,random.randint(1,20)]
+}
+
+#include ID, roomID, enemyIDs, whether it has been beaten
+battles = {
+	1: [2,(1,2),0],
+	2: [3,(3,4,5),0],
+	3: [13,(6,7,8),0],
+	4: [16,(9,10,11,12),0],
+	5: [18,(13,14,15,16),0],
+	6: [18,(17,18,19),0],
+	7: [20,(20,21,22,23),0],
+	8: [22,(24,25,26),0]
+}
+
+def AddEnemiesItem(enemyAI,items):
+	for n in range(len(enemies)):
+		if enemies[n+1][1] == enemyAI:
+			for m in range(len(items)):
+				addedItems = []
+				if random.randint(1,20) >= items[m][2]:
+					addedItems.append(items[m])
+			enemies[n+1].append(addedItems)
+
+#enemyAI afectes, followed by item ID, number and chance
+AddEnemiesItem(0,((3,random.randint(1,2),10),(5,random.randint(1,2),13),(6,random.randint(1,2),14)))
+AddEnemiesItem(1,((3,random.randint(1,2),10),(8,random.randint(1,15),12),(11,random.randint(1,2),14)))
+AddEnemiesItem(3,((3,random.randint(1,3),8),(7,random.randint(1,5),10),(9,1,0)))
+AddEnemiesItem(4,((3,random.randint(1,2),12),(7,random.randint(1,2),13)))
+AddEnemiesItem(6,((10,1,0),(1,0,20)))
+
 def PortalFun(num):
 	if PORTALS[n][num] == player[2]:
 		availablePortals.append(PORTALS[n])
@@ -100,6 +166,17 @@ def PortalMove(num, num2):
 				player[3][1] = availablePortals[n][num2][1]
 				print(f"you are now in {ROOMS[player[2]][0]}")
 
+def Move(playerDimension, roomMinDim, roomMaxDim):
+	if playerDimension < roomMinDim:
+		playerDimension = roomMinDim
+		player[3][0] = playerDimension
+	elif playerDimension > roomMaxDim:
+		playerDimension = roomMaxDim
+		player[3][0] = playerDimension
+	else:
+		playerDimension = playerDimension + newPosition
+		player[3][0] = playerDimension
+
 MOVE = ("move","1","m")
 INTERACT = ("interact","3","inter")
 ENTER = ("enter","4","ent","e")
@@ -110,8 +187,8 @@ NEW = ("new","n","1")
 LOAD = ("load","l","2")
 DELETE = ("delete","del","d","3")
 
-inTitle = 1
-while inTitle == 1:
+running = 1
+while running == 1:
 	print('''\n\tWelcome to Super Dungeon Quest!
 Please select an option:
 1. New Game
@@ -123,15 +200,19 @@ Please select an option:
 	if choice in NEW:
 		name = input("\nPlease enter a file name\n")
 		player[0] = name
-		inTitle = 0
+		running = 0
 		inGame = 1
 	elif choice in LOAD:
 		pass
 	elif choice in DELETE:
 		pass
 
-
 while inGame == 1:
+	if player[2] == 24:
+		print(ROOMS[player[2]][6])
+		print("\nThank you for playing!")
+		inGame == 0
+		break
 	playerX, playerY = player[3]
 	playerSpdMax, playerSpdMin = player[6]
 	playerStrMax, playerStrCurrent = player[7]
@@ -152,7 +233,6 @@ while inGame == 1:
 				availablePickups.append(pickups[n])
 
 	print(f"""\n\nPlayer: {player[0]}
-
 Your status is:
 	HP: {player[4][1]}/{player[4][0]}
 	MP: {player[5][1]}/{player[5][0]}
@@ -190,29 +270,13 @@ Your status is:
 			if newPosition > playerSpdMax or newPosition < playerSpdMin:
 				print(f"that is an invalid number! must be less than {playerSpdMax} and greater than {playerSpdMin}!\n")
 			else:
-				if playerX < ROOMMINW:
-					playerX = ROOMMINW
-					player[3][0] = playerX
-				elif playerX > ROOMMAXW:
-					playerX = ROOMMAXW
-					player[3][0] = playerX
-				else:
-					playerX = playerX + newPosition
-					player[3][0] = playerX
+				Move(playerX, ROOMMINW, ROOMMAXW)
 				newPosition = int(input(f"how far will you travel along the y axis? (current y: {playerY})\n"))
 				if newPosition > playerSpdMax or newPosition < playerSpdMin:
 					print(f"that is an invalid number! must be less than {playerSpdMax} and greater than {playerSpdMin}\n!")
 
 				else:
-					if playerY < ROOMMINH:
-						playerY = ROOMMINH
-						player[3][1] = playerY
-					elif playerY > ROOMMAXH:
-						playerY = ROOMMAXH
-						player[3][1] = playerY
-					else:
-						playerY = playerY + newPosition
-						player[3][1] = playerY
+					Move(playerY, ROOMMINH, ROOMMAXH)
 					print(f"done! You are now at {playerX},{playerY}")
 					playerTurn = 0
 
