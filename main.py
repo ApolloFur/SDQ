@@ -62,15 +62,20 @@ PORTALS = (
 ("A road that leads to the nearby town",0,24,(-1,3),(6,0),(1,10),(1,0))
 )
 #include item id, number, room id, location, whether they have been picked up
-pickups = (
-[3,1,1,(3,0),0],
-[5,1,8,(1,1),0],
-[6,1,13,(-1,-4),0],
-[8,20,12,(1,-1),0],
-[7,2,18,(4,-5),0],
-[5,1,20,(-1,-4),0],
-[11,1,3,(-1,-4),0]
-)
+pickups = [
+[8,20,12,(random.randint(0,2),random.randint(-2,0)),0],
+]
+
+for n in range(random.randint(3,10)):
+	rooms = random.randint(0,23)
+	item = []
+	for m in range(6):
+		item.append(random.randint(3,7))
+	item.sort()
+	item.reverse()
+	for m in range(3):
+		item.pop(random.randint(0,2))
+	pickups.append([item[random.randint(0,2)],random.randint(1,2),rooms,(random.randint(ROOMS[rooms][3]+1,ROOMS[rooms][4]-1),random.randint(ROOMS[rooms][1]+1,ROOMS[rooms][2]-1)),0])
 
 #include ID, name, AI type, location, HP, MP, SPD, STR, CON, INT, PER, initiative, what item it may drop and how much
 enemies = {
@@ -130,7 +135,7 @@ def AddEnemiesItem(enemyAI,items):
 					addedItems.append(items[m])
 			enemies[n+1].append(addedItems)
 
-#enemyAI afectes, followed by item ID, number and chance
+#enemyAI affected, followed by item ID, number and chance
 AddEnemiesItem(0,((3,random.randint(1,2),10),(5,random.randint(1,2),13),(6,random.randint(1,2),14)))
 AddEnemiesItem(1,((3,random.randint(1,2),10),(8,random.randint(1,15),12),(11,random.randint(1,2),14)))
 AddEnemiesItem(3,((3,random.randint(1,3),8),(7,random.randint(1,5),10),(9,1,0)))
