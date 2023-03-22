@@ -1,9 +1,56 @@
 import random
+class Player():
+	def __init__(self, name):
+		self.name = name
+		self.room = 0
+		self.pos = [0,0]
+		self.HP = [100,100]
+		self.MP = [100,100]
+		self.SPD = [5,-5]
+		self.STR = [6,6]
+		self.CON = [5,5]
+		self. INT = [6,6]
+		self.PER = [6,6]
+		self.ini = 0
+
+	def __str__(self):
+		return f'''Player: {self.name}
+Position: room {self.room} at {self.pos}
+Health: {self.HP[0]}/{self.HP[1]}
+Magic: {self.MP[0]}/{self.MP[1]}
+Speed: {self.SPD}
+Stats: STR {self.STR[0]}/{self.STR[1]}, CON {self.CON[0]}/{self.CON[1]}, INT {self.INT[0]}/{self.INT[1]}, PER {self.PER[0]},{self.PER[1]}
+Inventory: {playerInv}
+Current Initiative: {self.ini}'''
+
+	def Move(self):
+		pass
+	
+	def Interact(self):
+		for n in range(len(availablePickups)):
+			if self.pos[0] >= availablePickups[n][3][0]-6 and self.pos[0] <= availablePickups[n][3][0]+6 and self.pos[1] >= availablePickups[n][3][1]-6 and self.pos[1] <= availablePickups[n][3][1]+6:
+				playerInv[availablePickups[n][0]][1] += availablePickups[n][1]
+				for m in range(len(pickups)):
+					if pickups[m] == availablePickups[n]:
+						pickups[m][4] = 1
+	
+	def Enter(self):
+		currentRoom = self.room
+		for n in range(len(availablePortals)):
+			PortalMove(1,4)
+			if currentRoom == self.room:
+				PortalMove(2,3)
+			if currentRoom == self.room:
+				PortalMove(1,3)
+			if currentRoom == self.room:
+				PortalMove(2,4)
+			break
+
 #include name, ID, roomID, position, HP, MP, SPD, STR, CON, INT, PER, initiative
 player = ["Placeholder",0,0,[0,0],[100,100],[100,100],[5,-5],[6,6],[5,5],[6,6],[6,6],0]
 #include name, id, number
 playerInv = {1: ["sword",1],2: ["crossbow",1],3: ["HPotion",5],4: ["MPotion",5],5: ["STRPotion",0],6: ["CONPotion",1],7: ["INTPotion",0],8: ["bolts",30],9: ["BossKey",0],10: ["ExitKey",0],11: ["PERPotion",0]}
-playerSpells = ()
+playerSpells = {}
 #include name, minheight, maxheight, minwidth, maxwidth, whether it has been entered
 ROOMS = {
 0: ["WestWall",-11,5,-1,3,0,"A large wall that sprawls for miles stands beore you. It's crooked, mossy bricks barely held together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work."],
@@ -143,12 +190,12 @@ AddEnemiesItem(4,((3,random.randint(1,2),12),(7,random.randint(1,2),13)))
 AddEnemiesItem(6,((10,1,0),(1,0,20)))
 
 def PortalFun(num):
-	if PORTALS[n][num] == player[2]:
+	if PORTALS[n][num] == Player.room:
 		availablePortals.append(PORTALS[n])
 
 def AvailablePortalDisplay(num, brea):
 	for n in range(len(availablePortals)):
-		if availablePortals[n][num] == player[2]:
+		if availablePortals[n][num] == Player.room:
 			print(f"{availablePortals[n][0]} at {availablePortals[n][3]}")
 			if brea == 1:
 				break
@@ -156,31 +203,20 @@ def AvailablePortalDisplay(num, brea):
 
 def AvailablePickupDisplay(message, brea):
 	for n in range(len(availablePickups)):
-		if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
+		if Player.pos[0] >= availablePickups[n][3][0]-6 and Player.pos[0] <= availablePickups[n][3][0]+6 and Player.pos[1] >= availablePickups[n][3][1]-6 and Player.pos[1] <= availablePickups[n][3][1]+6:
 			print(message)
 			if brea == 1:
 				break
 
 def PortalMove(num, num2):
-	if playerX == availablePortals[n][num2][0] and playerY == availablePortals[n][num2][1]:
+	if Player.pos[0] == availablePortals[n][num2][0] and Player.pos[1] == availablePortals[n][num2][1]:
 		if availablePortals[n][5][0] == 0 or (availablePortals[n][5][0] == 1 and playerInv[availablePortals[n][5][1]] > 0):
 			if availablePortals[n][6][0] == 0 or (availablePortals[n][6][0] == 1 and player[2] != availablePortals[n][6][1]):
 				print(f"you have successfully left {ROOMS[player[2]][0]}")
-				player[2] = availablePortals[n][num]
-				player[3][0] = availablePortals[n][num2][0]
-				player[3][1] = availablePortals[n][num2][1]
-				print(f"you are now in {ROOMS[player[2]][0]}")
-
-def Move(playerDimension, roomMinDim, roomMaxDim):
-	if playerDimension < roomMinDim:
-		playerDimension = roomMinDim
-		player[3][0] = playerDimension
-	elif playerDimension > roomMaxDim:
-		playerDimension = roomMaxDim
-		player[3][0] = playerDimension
-	else:
-		playerDimension = playerDimension + newPosition
-		player[3][0] = playerDimension
+				Player.room = availablePortals[n][num]
+				Player.pos[0] = availablePortals[n][num2][0]
+				Player.pos[1] = availablePortals[n][num2][1]
+				print(f"you are now in {ROOMS[Player.room][0]}")
 
 MOVE = ("move","1","m")
 INTERACT = ("interact","3","inter")
@@ -204,7 +240,7 @@ Please select an option:
 
 	if choice in NEW:
 		name = input("\nPlease enter a file name\n")
-		player[0] = name
+		Player = Player(name)
 		running = 0
 		inGame = 1
 	elif choice in LOAD:
@@ -213,7 +249,7 @@ Please select an option:
 		pass
 
 while inGame == 1:
-	if player[2] == 24:
+	if Player.room == 24:
 		print(ROOMS[player[2]][6])
 		print("\nThank you for playing!")
 		inGame == 0
@@ -233,26 +269,26 @@ while inGame == 1:
 		PortalFun(2)
 	availablePickups = []
 	for n in range(len(pickups)):
-		if pickups[n][2] == player[2]:
+		if pickups[n][2] == Player.room:
 			if pickups[n][4] == 0:
 				availablePickups.append(pickups[n])
 
-	print(f"""\n\nPlayer: {player[0]}
+	print(f"""\n\nPlayer: {Player.name}
 Your status is:
-	HP: {player[4][1]}/{player[4][0]}
-	MP: {player[5][1]}/{player[5][0]}
-	current position:{playerX},{playerY}
-	current room: {ROOMS[player[2]][0]}\n""")
-	if ROOMS[player[2]][5] == 0:
-		print(ROOMS[player[2]][6])
-		ROOMS[player[2]][5] = 1
+	HP: {Player.HP[0]}/{Player.HP[1]}
+	MP: {Player.MP[0]}/{Player.MP[1]}
+	current position:{Player.pos[0]},{Player.pos[1]}
+	current room: {ROOMS[Player.room][0]}\n""")
+	if ROOMS[Player.room][5] == 0:
+		print(ROOMS[Player.room][6])
+		ROOMS[Player.room][5] = 1
 	print("\nyou see:")
 
 	AvailablePortalDisplay(1, 0)
 	AvailablePortalDisplay(2, 0)
 
 	for n in range(len(availablePickups)):
-		if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
+		if Player.pos[0] >= availablePickups[n][3][0]-6 and Player.pos[0] <= availablePickups[n][3][0]+6 and Player.pos[1] >= availablePickups[n][3][1]-6 and Player.pos[1] <= availablePickups[n][3][1]+6:
 			print(f"{playerInv[availablePickups[n][0]][0]} at {availablePickups[n][3]}")
 			break
 
@@ -262,7 +298,7 @@ Your status is:
 	AvailablePickupDisplay("\t3. interact", 1)
 
 	for n in range(len(availablePortals)):
-		if (playerX == availablePortals[n][3][0] and playerY == availablePortals[n][3][1]) or (playerX == availablePortals[n][4][0] and playerY == availablePortals[n][4][1]):
+		if (Player.pos[0] == availablePortals[n][3][0] and Player.pos[1] == availablePortals[n][3][1]) or (Player.pos[0] == availablePortals[n][4][0] and Player.pos[1] == availablePortals[n][4][1]):
 			print("\t4. enter")
 			break
 
@@ -271,18 +307,16 @@ Your status is:
 	if chosen in MOVE:
 		playerTurn = 1
 		while playerTurn == 1:
-			newPosition = int(input(f"how far will you travel along the X axis? (current x: {playerX})\n"))
-			if newPosition > playerSpdMax or newPosition < playerSpdMin:
-				print(f"that is an invalid number! must be less than {playerSpdMax} and greater than {playerSpdMin}!\n")
+			newPositionX = int(input(f"how far will you travel along the X axis? (current x: {Player.pos[0]})\n"))
+			if newPositionX > Player.SPD[0] or newPositionX < Player.SPD[1]:
+				print(f"that is an invalid number! must be less than {Player.SPD[0]} and greater than {Player.SPD[1]}!\n")
 			else:
-				Move(playerX, ROOMMINW, ROOMMAXW)
-				newPosition = int(input(f"how far will you travel along the y axis? (current y: {playerY})\n"))
-				if newPosition > playerSpdMax or newPosition < playerSpdMin:
-					print(f"that is an invalid number! must be less than {playerSpdMax} and greater than {playerSpdMin}\n!")
+				newPositionY = int(input(f"how far will you travel along the y axis? (current y: {playerY})\n"))
+				if newPositionY > Player.SPD[0] or newPositionY < Player.SPD[1]:
+					print(f"that is an invalid number! must be less than {Player.SPD[0]} and greater than {Player.SPD[1]}\n!")
 
 				else:
-					Move(playerY, ROOMMINH, ROOMMAXH)
-					print(f"done! You are now at {playerX},{playerY}")
+					print(f"done! You are now at {Player.pos[0]},{Player.pos[1]}")
 					playerTurn = 0
 
 	elif chosen in INV:
@@ -304,21 +338,7 @@ Your status is:
 			elif chosen in QUIT:
 				inInventory = 0
 	elif chosen in INTERACT:
-		for n in range(len(availablePickups)):
-			if playerX >= availablePickups[n][3][0]-6 and playerX <= availablePickups[n][3][0]+6 and playerY >= availablePickups[n][3][1]-6 and playerY <= availablePickups[n][3][1]+6:
-				playerInv[availablePickups[n][0]][1] += availablePickups[n][1]
-				for m in range(len(pickups)):
-					if pickups[m] == availablePickups[n]:
-						pickups[m][4] = 1
+		Player.Interact()
 
 	elif chosen in ENTER:
-		currentRoom = player[2]
-		for n in range(len(availablePortals)):
-			PortalMove(1,4)
-			if currentRoom == player[2]:
-				PortalMove(2,3)
-			if currentRoom == player[2]:
-				PortalMove(1,3)
-			if currentRoom == player[2]:
-				PortalMove(2,4)
-			break
+		Player.Enter()
