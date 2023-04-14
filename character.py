@@ -36,9 +36,42 @@ Current Initiative: {self.ini}'''
 class Player(Character):
 	def __Init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER):
 		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER)
-		self.playerInv = {}
+		self.inv = {}
 	
 	def __str__(self):
 		rep = super().__str__()
 		rep += f"\nPlayer inventory: {self.playerInv}"
 		return rep
+
+	def Interact(self):
+		pass
+
+	def Enter(self):
+		pass
+
+	def Inventory(self):
+		USE = ("u","use","1")
+		QUIT = ("q","quit","2")
+		inInv = 1
+		while inInv == 1:
+			invKeys = list(self.inv.keys())
+			print("You have:\n[Item name, Number of items]")
+			for n in range(len(invKeys)):
+				print(self.inv[invKeys[n]])
+			choice = input('''What would you like to do?
+	1: Use
+	2: Quit\n''')
+			if choice.lower() in USE:
+				pass
+			elif choice.lower() in QUIT:
+				inInv = 0
+
+
+class Enemy(Character):
+	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, type):
+		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER)
+		self.ai = type
+	
+	def __str__(self):
+		rep = super().__str__()
+		rep += f'\nAI type: {self.ai}'
