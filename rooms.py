@@ -33,8 +33,8 @@ class Portal:
 	def __str__(self):
 		rep = f'''Portal: {self.name}
 Positions:
-	in: {self.posIn} in Room {self.roomIn[0].name}
-	out: {self.posOut} in Room {self.roomOut[0].name}'''
+	in: {self.posIn} in Room {self.roomIn[0]}
+	out: {self.posOut} in Room {self.roomOut[0]}'''
 		if self.locked[0] == 0:
 			rep += '\nPortal is not locked'
 		if self.locked[0] == 1:
