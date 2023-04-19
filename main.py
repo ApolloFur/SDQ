@@ -3,7 +3,7 @@ import character
 import rooms
 import items
 
-Player = character.Player("placeholder",0,[0,0],100,100,6,6,5,6,6)
+Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6)
 #generate default player inventory
 Player.inv = {}
 Player.inv["Broadword"] = items.Weapon("Broadword",1,[3,6],2)
@@ -67,7 +67,7 @@ PORTALKEYS = list(PORTALS.keys())
 
 #generate pickups
 pickups = []
-for n in range(random.randint(5,15)):
+for n in range(random.randint(5,10)):
 	chosenRoom = ROOMS[ROOMKEYS[random.randint(0,21)]]
 	type = random.randint(0,5)
 	if type == 0:
@@ -75,6 +75,65 @@ for n in range(random.randint(5,15)):
 	if type == 1:
 		name = "MPotion"
 	if type == 2:
-		name = ""
-	#include item, room, and location
-	pickups.append([items.Consumable(name,random.randint(1,2),type),chosenRoom.name,[random.randint(chosenRoom.X[0] + 1,chosenRoom.X[1] - 1),random.randint(chosenRoom.Y[0] + 1,chosenRoom.Y[1] - 1)]])
+		name = "STRPotion"
+	if type == 3:
+		name = "CONPotion"
+	if type == 4:
+		name = "INTPotion"
+	if type == 5:
+		name = "PERPotion"
+	#include item, room, location, and if it's activated
+	pickups.append([items.Consumable(f"{name}",random.randint(1,2),type),chosenRoom.name,[random.randint(chosenRoom.X[0] + 1,chosenRoom.X[1] - 1),random.randint(chosenRoom.Y[0] + 1,chosenRoom.Y[1] - 1)],1])
+
+inGame = 1
+while inGame == 1:
+	if Player.room == "Main Road":
+		inGame = 0
+		print("Thank you for playing!")
+		break
+
+	availablePortals = []
+	for key in PORTALS:
+		if PORTALS[key].roomIn[0] == Player.room:
+			portalRoom = 0
+		elif PORTALS[key].roomOut[0] == Player.room:
+			portalRoom = 1
+		else:
+			portalRoom = 3
+
+		if portalRoom == 0:
+			if PORTALS[key].roomIn[1] == 1:
+				availablePortals.append(PORTALS[key])
+		elif portalRoom == 1:
+			if PORTALS[key].roomOut[1] == 1:
+				availablePortals.append(PORTALS[key])
+
+	availablePickups = []
+	for n in range(len(pickups)):
+		if pickups[n][1] == Player.room:
+			if pickups[n][3] == 1:
+				availablePickups.append(pickups[n])
+	
+	print(f'''\n\nPlayer: {Player.name}
+Your status is:
+	HP: {Player.HP[0]}/{Player.HP[1]}
+	MP: {Player.MP[0]}/{Player.MP[1]}
+	Current position: ({Player.pos[0]},{Player.pos[1]})
+	Current Room: {Player.room}
+
+you see:''')
+	for n in range(len(availablePortals)):
+		portalDisplay = f"{availablePortals[n].name} at "
+
+		if availablePortals[n].roomIn[0] == Player.room:
+			portalDisplay += f"{availablePortals[n].posIn}"
+		elif availablePortals[n].roomOut[0] == Player.room:
+			portalDisplay += f"{availablePortals[n].posOut}"
+		
+		print(portalDisplay)
+	
+	for n in range(len(availablePickups)):
+		if Player.pos[0] >= availablePickups[n][2][0]-6 and Player.pos[0] <= availablePickups[n][2][0]+6 and Player.pos[1] >= availablePickups[n][2][1]-6 and Player.pos[1] <= availablePickups[n][2][1]+6:
+			print(f"{availablePickups[n][0].name}")
+	
+	input("\n")

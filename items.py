@@ -1,5 +1,5 @@
 class Item():
-	def __Init(self, name, quantity):
+	def __init__(self, name, quantity):
 		self.name = name
 		self.quan = quantity
 	
@@ -15,7 +15,7 @@ class Consumable(Item):
 	
 	def __str__(self):
 		rep = super().__str__()
-		rep += f"\nPotion type: {self.type}"
+		rep += f"\nConsumable type: {self.type}"
 	
 	def use(self):
 		pass
