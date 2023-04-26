@@ -125,7 +125,10 @@ Your status is:
 	HP: {Player.HP[0]}/{Player.HP[1]}
 	MP: {Player.MP[0]}/{Player.MP[1]}
 	Current position: ({Player.pos[0]},{Player.pos[1]})
-	Current Room: {Player.room}''')
+	Current Room: {Player.room}
+	Current Room Size:
+		X: {ROOMS[Player.room].X[0]} - {ROOMS[Player.room].X[1]}
+		Y: {ROOMS[Player.room].Y[0]} - {ROOMS[Player.room].Y[1]}''')
 
 	if ROOMS[Player.room].ent == 0:
 		print(f"\n{ROOMS[Player.room].message}")
@@ -161,7 +164,7 @@ Your status is:
 	chosen = input("")
 
 	if chosen.lower() in MOVE:
-		Player.PlayerMove()
+		Player.PlayerMove(ROOMS[Player.room])
 
 	elif chosen.lower() in INVENTORY:
 		Player.Inventory()

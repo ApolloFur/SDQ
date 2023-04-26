@@ -16,8 +16,8 @@ class Room:
 		rep += f'''\nEntrance text:
 	{self.message}
 Room Dimensions:
-	X: {self.X[0]}-{self.X[1]}
-	Y: {self.Y[0]}-{self.Y[1]}'''
+	X: {self.X[0]} - {self.X[1]}
+	Y: {self.Y[0]} - {self.Y[1]}'''
 		return rep
 
 class Portal:

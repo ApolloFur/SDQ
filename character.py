@@ -26,9 +26,19 @@ Stats:
 Current Initiative: {self.ini}'''
 		return rep
 
-	def Move(self, X, Y):
+	def Move(self, X, Y, room):
 		self.pos[0] += X
 		self.pos[1] += Y
+
+		if self.pos[0] > room.X[1]:
+			self.pos[0] = room.X[1]
+		elif self.pos[0] < room.X[0]:
+			self.pos[0] = room.X[0]
+
+		if self.pos[1] > room.Y[1]:
+			self.pos[1] = room.Y[1]
+		elif self.pos[1] < room.Y[0]:
+			self.pos[1] = room.Y[0]
 
 	def Attack(self):
 		pass
@@ -44,7 +54,7 @@ class Player(Character):
 		rep += f"\nPlayer inventory: {self.playerInv}"
 		return rep
 	
-	def PlayerMove(self):
+	def PlayerMove(self, room):
 		playerMoveX = 1
 		playerMoveY = 1
 		while playerMoveX == 1:
@@ -61,14 +71,14 @@ class Player(Character):
 							print("That wasn't a number!")
 						else:
 							if newPositionY >= self.SPD[0] and newPositionY <= self.SPD[1]:
-								super().Move(newPositionX, newPositionY)
+								super().Move(newPositionX, newPositionY, room)
 								print(f"Done! You are now at ({self.pos[0]}, {self.pos[1]})")
 								playerMoveX = 0
 								playerMoveY = 0
 							else:
-								print(f"that's too fast! Must be from {self.SPD[0]}-{self.SPD[1]}!")
+								print(f"that's too fast! Must be from {self.SPD[0]} - {self.SPD[1]}!")
 				else:
-					print(f"That's too fast! Must be from {self.SPD[0]}-{self.SPD[1]}!")
+					print(f"That's too fast! Must be from {self.SPD[0]} - {self.SPD[1]}!")
 
 	def Pickup(self,item):
 		if self.inv.get(item.name, None):
