@@ -5,7 +5,7 @@ class Character:
 		self.pos = pos
 		self.HP = [HP,HP]
 		self.MP = [MP,MP]
-		self.SPD = [SPD,-SPD]
+		self.SPD = [-SPD,SPD]
 		self.STR = [STR,STR]
 		self.CON = [CON,CON]
 		self.INT = [INT,INT]
@@ -26,8 +26,9 @@ Stats:
 Current Initiative: {self.ini}'''
 		return rep
 
-	def Move(self):
-		pass
+	def Move(self, X, Y):
+		self.pos[0] += X
+		self.pos[1] += Y
 
 	def Attack(self):
 		pass
@@ -42,12 +43,52 @@ class Player(Character):
 		rep = super().__str__()
 		rep += f"\nPlayer inventory: {self.playerInv}"
 		return rep
+	
+	def PlayerMove(self):
+		playerMoveX = 1
+		playerMoveY = 1
+		while playerMoveX == 1:
+			try:
+				newPositionX = int(input(f"How far will you travel along the X axis? (Current X is {self.pos[0]})\n"))
+			except ValueError:
+				print("That wasn't a number!")
+			else:
+				if newPositionX >= self.SPD[0] and newPositionX <= self.SPD[1]:
+					while playerMoveY == 1:
+						try:
+							newPositionY = int(input(f"How far will you travel along the Y axis? (Current Y is {self.pos[1]})\n"))
+						except ValueError:
+							print("That wasn't a number!")
+						else:
+							if newPositionY >= self.SPD[0] and newPositionY <= self.SPD[1]:
+								super().Move(newPositionX, newPositionY)
+								print(f"Done! You are now at ({self.pos[0]}, {self.pos[1]})")
+								playerMoveX = 0
+								playerMoveY = 0
+							else:
+								print(f"that's too fast! Must be from {self.SPD[0]}-{self.SPD[1]}!")
+				else:
+					print(f"That's too fast! Must be from {self.SPD[0]}-{self.SPD[1]}!")
 
-	def Interact(self):
-		pass
+	def Pickup(self,item):
+		if self.inv.get(item.name, None):
+			self.inv[item.name].quan += item.quan
+		else:
+			self.inv[item.name] = item
 
-	def Enter(self):
-		pass
+	def Enter(self, portal):
+		if self.room == portal.roomIn[0]:
+			if portal.roomIn[1] == 1:
+				self.room = portal.roomOut[0]
+				self.pos[0] = portal.posOut[0]
+				self.pos[1] = portal.posOut[1]
+		elif self.room == portal.roomOut[0]:
+			if portal.roomOut[1] == 1:
+				self.room = portal.roomIn[0]
+				self.pos[0] = portal.posIn[0]
+				self.pos[1] = portal.posIn[1]
+		else:
+			print("uh-oh. Looks like we tried sending you to another room without you being in the right room.")
 
 	def Inventory(self):
 		USE = ("u","use","1")
@@ -55,9 +96,16 @@ class Player(Character):
 		inInv = 1
 		while inInv == 1:
 			invKeys = list(self.inv.keys())
-			print("You have:\n[Item name, Number of items]")
+			print("You have:\n")
 			for n in range(len(invKeys)):
-				print(self.inv[invKeys[n]])
+				invItem = f"{self.inv[invKeys[n]].name}"
+				try:
+					invItem += f" ({self.inv[invKeys[n]].damage[0]}d{self.inv[invKeys[n]].damage[1]}, range {self.inv[invKeys[n]].range})"
+				except AttributeError:
+					invItem += f": {self.inv[invKeys[n]].quan}"
+				else:
+					invItem += f": {self.inv[invKeys[n]].quan}"
+				print(invItem)
 			choice = input('''What would you like to do?
 	1: Use
 	2: Quit\n''')

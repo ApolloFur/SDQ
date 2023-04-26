@@ -4,7 +4,7 @@ import rooms
 import items
 
 Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6)
-#generate default player inventory.
+#generate default player inventory
 Player.inv = {}
 Player.inv["Broadword"] = items.Weapon("Broadword",1,[3,6],2)
 Player.inv["Crossbow"] = items.Weapon("Crossbow",1,[4,4],10)
@@ -85,6 +85,12 @@ for n in range(random.randint(5,10)):
 	#include item, room, location, and if it's activated
 	pickups.append([items.Consumable(f"{name}",random.randint(1,2),type),chosenRoom.name,[random.randint(chosenRoom.X[0] + 1,chosenRoom.X[1] - 1),random.randint(chosenRoom.Y[0] + 1,chosenRoom.Y[1] - 1)],1])
 
+MOVE = ("1","m","move")
+INVENTORY = ("2","i","inv")
+PICKUP = ("3","p","pickup")
+ENTER = ("4","e","enter")
+SAVE = ("s","save")
+
 inGame = 1
 while inGame == 1:
 	if Player.room == "Main Road":
@@ -119,9 +125,13 @@ Your status is:
 	HP: {Player.HP[0]}/{Player.HP[1]}
 	MP: {Player.MP[0]}/{Player.MP[1]}
 	Current position: ({Player.pos[0]},{Player.pos[1]})
-	Current Room: {Player.room}
+	Current Room: {Player.room}''')
 
-you see:''')
+	if ROOMS[Player.room].ent == 0:
+		print(f"\n{ROOMS[Player.room].message}")
+		ROOMS[Player.room].ent = 1
+
+	print("\nyou see:")
 	for n in range(len(availablePortals)):
 		portalDisplay = f"{availablePortals[n].name} at "
 
@@ -134,6 +144,35 @@ you see:''')
 	
 	for n in range(len(availablePickups)):
 		if Player.pos[0] >= availablePickups[n][2][0]-6 and Player.pos[0] <= availablePickups[n][2][0]+6 and Player.pos[1] >= availablePickups[n][2][1]-6 and Player.pos[1] <= availablePickups[n][2][1]+6:
-			print(f"{availablePickups[n][0].name}")
+			print(f"{availablePickups[n][0].name} at ({availablePickups[n][2][0]}, {availablePickups[n][2][1]})")
 	
-	input("\n")
+	print('''\nPleast pick an option:
+	1. Move
+	2. Inventory''')
+	for n in range(len(availablePickups)):
+		if Player.pos[0] >= availablePickups[n][2][0]-6 and Player.pos[0] <= availablePickups[n][2][0]+6 and Player.pos[1] >= availablePickups[n][2][1]-6 and Player.pos[1] <= availablePickups[n][2][1]+6:
+			print("\t3. Pickup")
+			break
+	for n in range(len(availablePortals)):
+		if (Player.pos[0] == availablePortals[n].posIn[0] and Player.pos[1] == availablePortals[n].posIn[1]) or (Player.pos[0] == availablePortals[n].posOut[0] and Player.pos[1] == availablePortals[n].posOut[1]):
+			print("\t4. Enter")
+			break
+	
+	chosen = input("")
+
+	if chosen.lower() in MOVE:
+		Player.PlayerMove()
+
+	elif chosen.lower() in INVENTORY:
+		Player.Inventory()
+
+	elif chosen.lower() in PICKUP:
+		for n in range(len(availablePickups)):
+			if Player.pos[0] >= availablePickups[n][2][0]-6 and Player.pos[0] <= availablePickups[n][2][0]+6 and Player.pos[1] >= availablePickups[n][2][1]-6 and Player.pos[1] <= availablePickups[n][2][1]+6:
+				Player.Pickup(availablePickups[n][0])
+				availablePickups[n][3] = 0
+
+	elif chosen.lower() in ENTER:
+		for n in range(len(availablePortals)):
+			if (availablePortals[n].posIn[0] == Player.pos[0] and availablePortals[n].posIn[1] == Player.pos[1]) or (availablePortals[n].posOut[0] == Player.pos[0] and availablePortals[n].posOut[1] == Player.pos[1]):
+				Player.Enter(availablePortals[n])

@@ -26,7 +26,7 @@ class Weapon(Item):
 	def __init__(self, name, quantity, damage, rang):
 		super().__init__(name, quantity)
 		self.damage = damage
-		self.rang = rang
+		self.range = rang
 	
 	def __str__(self):
 		rep = super().__str__()
