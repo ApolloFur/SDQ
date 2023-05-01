@@ -3,7 +3,7 @@ import character
 import rooms
 import items
 
-Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6)
+Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6,16,3)
 #generate default player inventory
 Player.inv = {}
 Player.inv["Broadword"] = items.Weapon("Broadword",1,[3,6],2)
@@ -125,10 +125,7 @@ Your status is:
 	HP: {Player.HP[0]}/{Player.HP[1]}
 	MP: {Player.MP[0]}/{Player.MP[1]}
 	Current position: ({Player.pos[0]},{Player.pos[1]})
-	Current Room: {Player.room}
-	Current Room Size:
-		X: {ROOMS[Player.room].X[0]} - {ROOMS[Player.room].X[1]}
-		Y: {ROOMS[Player.room].Y[0]} - {ROOMS[Player.room].Y[1]}''')
+	Current Room: {Player.room}''')
 
 	if ROOMS[Player.room].ent == 0:
 		print(f"\n{ROOMS[Player.room].message}")
@@ -164,7 +161,7 @@ Your status is:
 	chosen = input("")
 
 	if chosen.lower() in MOVE:
-		Player.PlayerMove(ROOMS[Player.room])
+		Player.PlayerMove()
 
 	elif chosen.lower() in INVENTORY:
 		Player.Inventory()
