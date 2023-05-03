@@ -1,3 +1,4 @@
+import random
 class Character:
 	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, EVA,GRT):
 		self.name = name
@@ -122,3 +123,54 @@ class Enemy(Character):
 	def __str__(self):
 		rep = super().__str__()
 		rep += f'\nAI type: {self.ai}'
+	
+	def EnemyMove(self, player):
+		if self.type == 0:
+			if player.pos[0] > self.pos[0]:
+				XAmount = self.SPD[1]
+				XAmount += random.randint(-2,2)
+			elif player.pos[0] < self.pos[0]:
+				XAmount = self.SPD[0]
+				XAmount += random.randint(-2,2)
+			else:
+				XAmount = random.randint(-1,1)
+			
+			if player.pos[1] > self.pos[1]:
+				YAmount = self.SPD[1]
+				YAmount += random.randint(-2,2)
+			elif player.pos[1] < self.pos[1]:
+				YAmount = self.SPD[0]
+				YAmount += random.randint(-2,2)
+			else:
+				YAmount = random.randint(-1,1)
+			
+			if XAmount > self.room.X[1]:
+				XAmount = self.room.X[1]
+			elif XAmount < self.room.X[0]:
+				XAmount = self.room.X[0]
+			if YAmount > self.room.Y[1]:
+				YAmount = self.room.Y[1]
+			elif YAmount < self.room.Y[0]:
+				YAmount = self.room.Y[0]
+		#The skeleton archer wants to remain at a rough distance from the player
+		elif self.type == 1:
+			IDEALDISTANCE = (6,8)
+			XAmount = 0
+			YAmount = 0
+		#The spider makes a beeline to the player
+		elif self.type == 2:
+			XAmount = player.pos[0] - self.pos[0]
+			YAmount = player.pos[1] - self.pos[1]
+			if XAmount > self.SPD[1]:
+				XAmount = self.SPD[1]
+			elif XAmount < self.SPD[0]:
+				XAmount = self.SPD[0]
+			if YAmount > self.SPD[1]:
+				YAmount = self.SPD[1]
+			elif YAmount < self.SPD[0]:
+				YAmount = self.SPD[0]
+		#Don't know what to do with the zombie bat yet
+		elif self.type == 3:
+			XAmount = random.randint(self.SPD[0],self.SPD[1])
+			YAmount = random.randint(self.SPD[0],self.SPD[1])
+		self.Move(XAmount, YAmount)

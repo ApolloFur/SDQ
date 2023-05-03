@@ -119,27 +119,44 @@ Enemy Positions:''')
 		MOVE = 0
 		ATTACK = 1
 		choice = random.randint(0,1)
+		enemy = self.characters[enemyID]
 		if choice in MOVE:
-			if self.player.pos[0] > self.characters[enemyID].pos[0]:
-				XAmount = self.characters[enemyID].SPD[1] - random.randint(0, 2)
-			else:
-				XAmount = self.characters[enemyID].SPD[0] + random.randint(0, 2)
-			
-			if self.player.pos[1] > self.characters[enemyID].pos[1]:
-				YAmount = self.characters[enemyID].SPD[1] - random.randint(0, 2)
-			else:
-				YAmount = self.characters[enemyID].SPD[1] + random.randint(0, 2)
-			
-			if XAmount > self.room.X[1]:
-				XAmount = self.room.X[1]
-			elif XAmount < self.room.X[0]:
-				XAmount = self.room.x[0]
-			
-			if YAmount > self.room.Y[1]:
-				YAmount = self.room.Y[1]
-			elif YAmount < self.room.Y[0]:
-				YAmount = self.room.Y[0]
-			
+			#The skeleton guard flails about in the rough direction of the player
+			if enemy.type == 0:
+				if self.player.pos[0] > enemy.pos[0]:
+					XAmount = enemy.SPD[1]
+					XAmount += random.randint(-2,2)
+				elif self.player.pos[0] < enemy.pos[0]:
+					XAmount = enemy.SPD[0]
+					XAmount += random.randint(-2,2)
+				else:
+					XAmount = random.randint(-1,1)
+				
+				if self.player.pos[1] > enemy.pos[1]:
+					YAmount = enemy.SPD[1]
+					YAmount += random.randint(-2,2)
+				elif self.player.pos[1] < enemy.pos[1]:
+					YAmount = enemy.SPD[0]
+					YAmount += random.randint(-2,2)
+				else:
+					YAmount = random.randint(-1,1)
+				
+				if XAmount > self.room.X[1]:
+					XAmount = self.room.X[1]
+				elif XAmount < self.room.X[0]:
+					XAmount = self.room.X[0]
+				if YAmount > self.room.Y[1]:
+					YAmount = self.room.Y[1]
+				elif YAmount < self.room.Y[0]:
+					YAmount = self.room.Y[0]
+			#The skeleton archer wants to remain at a rough distance from the player
+			elif enemy.type == 1:
+				IDEALDISTANCE = (6,8)
+				XAmount = 0
+				YAmount = 0
+			#The spider makes a beeline to the player
+			elif enemy.type == 2:
+				differenceX = self.player.pos[0] - enemy.pos[0]
 			self.characters[enemyID].Move(XAmount, YAmount)
 		elif choice in ATTACK:
 			pass
