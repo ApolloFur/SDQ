@@ -31,3 +31,15 @@ class Weapon(Item):
 	def __str__(self):
 		rep = super().__str__()
 		rep += f'''\nDeals {self.damage} damage at a range of {self.range}'''
+
+class Spell:
+	def __init__(self, name, damage, rang, cost):
+		self.name = name
+		self.damage = damage
+		self.range = rang
+		self.cost = cost
+	
+	def __str__(self):
+		rep = f'''Spell: {self.name}
+Does {self.damage[0]}d{self.damage[1]} damage at a range of {self.range}
+Costs {self.cost} MP to cast'''

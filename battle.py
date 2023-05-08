@@ -23,7 +23,7 @@ characters included:'''
 	def Begin(self):
 		if self.End() == 0:
 			for n in range(len(self.characters)):
-				if self.characters[n] is self.player:
+				if self.characters[n].name == self.player.name:
 					self.PlayerTurn()
 				else:
 					self.EnemyTurn(n)
@@ -40,9 +40,9 @@ Your status is:
 
 Enemy Positions:''')
 		for character in self.characters:
-			if character is not self.player:
+			if character.name != self.player.name:
 				print(f"\t{character.name} at ({character.pos[0]}, {character.pos[1]})")
-		print('''\nPlease pcik an option:
+		print('''\nPlease pick an option:
 	1. Move
 	2. Inventory
 	3. Attack''')
@@ -51,115 +51,110 @@ Enemy Positions:''')
 		if chosen in MOVE:
 			self.player.PlayerMove()
 			for character in self.characters:
-				if character is self.player:
+				if character.name == self.player.name:
 					character.pos = self.player.pos
 
 		elif chosen in INV:
 			self.player.Inventory()
 
 		elif chosen in ATT:
-			choosingWeapon = 1
-
-			while choosingWeapon == 1:
-				print('''\nWhat weapon would you like to use?
-	available weapons:''')
-				for n in range(len(self.player.inv)):
-					try:
-						dmg = self.player.inv[n].damage
-					except ValueError:
-						pass
-					else:
-						print(f"{self.player.inv[n].name}: {self.player.inv[n].damage[0]}d{self.player.inv[n].damage[1]} at {self.player.inv[n].range} range")
-				weaponChoice = input("")
-				try:
-					dmg = self.player.inv[weaponChoice].damage
-				except ValueError:
-					print("That wasn't a weapon!")
-				else:
-					choosingWeapon = 0
-					choosingEnemy = 1
-
-					while choosingEnemy == 1:
-						print('''\nWhat enemy are you targeting?
-		available enemies:''')
-						for character in self.characters:
-							if character is not self.player:
-								enemyXDis = abs((self.characters[character].pos[0] - self.player.pos[0])^2)
-								enemyYDis = abs((self.characters[character].pos[1] - self.player.pos[1])^2)
-								enemyDis = math.sqrt(enemyXDis + enemyYDis)
-								if enemyDis <= self.player.inv[weaponChoice].range:
-									print(f"{self.characters[character].name} at ({self.characters[character].pos[0]},{self.characters[character].pos[1]})")
-						enemyChoice = input("")
-						for n in range(len(self.characters)):
-							if self.characters[n].name == enemyChoice:
-								chosenEID = n
-								choosingEnemy = 0
-								break
+			SPELL = ('s','spell')
+			WEAPON = ('w','weapon')
+			choosingSpellWep = 1
+			while choosingSpellWep == 1:
+				chosen = input("Are you using a spell or a weapon?\n")
+				if chosen in WEAPON:
+					choosingSpellWep = 0
+					choosingWeapon = 1
+					while choosingWeapon == 1:
+						print('''\nWhat weapon would you like to use?
+		available weapons:''')
+						for n in range(len(self.player.inv)):
+							try:
+								dmg = self.player.inv[n].damage
+							except ValueError:
+								pass
 							else:
-								print("Enemy not found! Please try again")
-					
-					hitRoll = random.randint(0,20)
-					hitRoll += self.player.GRT
-					if hitRoll > self.characters[chosenEID].EVA:
-						damage = 0
-						for n in range(self.player.inv[weaponChoice].damage[0]):
-							damage += random.randint(1, self.player.inv[weaponChoice].damage[1])
-						if self.player.inv[weaponChoice].range > 3:
-							damage += self.player.PER
-						elif self.player.inv[weaponChoice].range <= 3:
-							damage+= self.player.STR
-						self.characters[chosenEID].HP -= damage
+								print(f"{self.player.inv[n].name}: {self.player.inv[n].damage[0]}d{self.player.inv[n].damage[1]} at {self.player.inv[n].range} range")
+						weaponChoice = input("")
+						try:
+							dmg = self.player.inv[weaponChoice].damage
+						except ValueError:
+							print("That wasn't a weapon!")
+						else:
+							choosingWeapon = 0
+				elif chosen in SPELL:
+					choosingSpell = 1
+					while choosingSpell == 1:
+						print('''\nWhat spell would you like to use?
+	available spells:''')
+						for n in range(len(self.player.spells)):
+							print(f"{self.player.spells[n].name}: {self.player.spells[n].damage[0]}d{self.player.spells.damage[1]} at {self.player.spells[n].range} range")
+						spellChoice = input("")
+						try:
+							dmg = self.player.spells[spellChoice].damage
+						except ValueError:
+							print("That wasn't a spell!")
+						else:
+							choosingSpell = 0
+							choosingEnemy = 1
+							while choosingEnemy == 1:
+								print('''\nWhat enemy are you targeting?
+				available enemies:''')
+								for character in self.characters:
+									if character.name != self.player.name:
+										enemyXDis = abs((self.characters[character].pos[0] - self.player.pos[0])^2)
+										enemyYDis = abs((self.characters[character].pos[1] - self.player.pos[1])^2)
+										enemyDis = math.sqrt(enemyXDis + enemyYDis)
+										if enemyDis <= self.player.inv[weaponChoice].range:
+											print(f"{self.characters[character].name} at ({self.characters[character].pos[0]},{self.characters[character].pos[1]})")
+								enemyChoice = input("")
+								for n in range(len(self.characters)):
+									if self.characters[n].name == enemyChoice:
+										chosenEID = n
+										choosingEnemy = 0
+										break
+									else:
+										print("Enemy not found! Please try again")
+							
+							hitRoll = random.randint(0,20)
+							hitRoll += self.player.GRT
+							if hitRoll > self.characters[chosenEID].EVA:
+								damage = 0
+								for n in range(self.player.inv[weaponChoice].damage[0]):
+									damage += random.randint(1, self.player.inv[weaponChoice].damage[1])
+								if self.player.inv[weaponChoice].range > 3:
+									damage += self.player.PER
+								elif self.player.inv[weaponChoice].range <= 3:
+									damage+= self.player.STR
+								self.characters[chosenEID].HP -= damage
 
-						if self.characters[chosenEID].HP <1:
-							if self.characters[chosenEID] is not self.player:
-								killed = self.characters[chosenEID].pop()
-								print(f"You have killed {killed.name}!")
+								if self.characters[chosenEID].HP <1:
+									if self.characters[chosenEID] is not self.player:
+										killed = self.characters[chosenEID].pop()
+										print(f"You have killed {killed.name}!")
 	
 	def EnemyTurn(self, enemyID):
 		MOVE = 0
 		ATTACK = 1
-		choice = random.randint(0,1)
+		choice, weapon = enemy.EnemyChoice(self.player)
 		enemy = self.characters[enemyID]
 		if choice in MOVE:
-			#The skeleton guard flails about in the rough direction of the player
-			if enemy.type == 0:
-				if self.player.pos[0] > enemy.pos[0]:
-					XAmount = enemy.SPD[1]
-					XAmount += random.randint(-2,2)
-				elif self.player.pos[0] < enemy.pos[0]:
-					XAmount = enemy.SPD[0]
-					XAmount += random.randint(-2,2)
-				else:
-					XAmount = random.randint(-1,1)
-				
-				if self.player.pos[1] > enemy.pos[1]:
-					YAmount = enemy.SPD[1]
-					YAmount += random.randint(-2,2)
-				elif self.player.pos[1] < enemy.pos[1]:
-					YAmount = enemy.SPD[0]
-					YAmount += random.randint(-2,2)
-				else:
-					YAmount = random.randint(-1,1)
-				
-				if XAmount > self.room.X[1]:
-					XAmount = self.room.X[1]
-				elif XAmount < self.room.X[0]:
-					XAmount = self.room.X[0]
-				if YAmount > self.room.Y[1]:
-					YAmount = self.room.Y[1]
-				elif YAmount < self.room.Y[0]:
-					YAmount = self.room.Y[0]
-			#The skeleton archer wants to remain at a rough distance from the player
-			elif enemy.type == 1:
-				IDEALDISTANCE = (6,8)
-				XAmount = 0
-				YAmount = 0
-			#The spider makes a beeline to the player
-			elif enemy.type == 2:
-				differenceX = self.player.pos[0] - enemy.pos[0]
-			self.characters[enemyID].Move(XAmount, YAmount)
+			enemy.EnemyMove(self.player)
 		elif choice in ATTACK:
-			pass
+			damage = 0
+			for n in range(weapon.damage[0]):
+				damage += random.randint(1, weapon.damage[1])
+			try:
+				enemy.MP[1] -= weapon.cost
+				self.characters[enemyID].MP[1] -= weapon.cost
+			except AttributeError:
+				pass
+			for character in self.characters:
+				if character.name == self.player.name:
+					self.characters.HP[1] -= damage
+			self.player.HP[1] -= damage
+
 		
 	def End(self):
 		if self.player.HP[1] < 1:
