@@ -1,17 +1,20 @@
 import random
 import math
+import time
 class Battle:
-	def __init__(self, player, enemies, room):
+	def __init__(self, player, enemies, room, message):
 		self.player = player
 		self.enemies = enemies
 		self.characters = [self.player] + self.enemies
-		for character in self.characters:
-			self.characters[character].ini = random.randint(0,20)
-			self.characters[character].ini += character.SPD[1]
+		for n in range(len(self.characters)):
+			self.characters[n].ini = random.randint(1,20)
+			self.characters[n].ini += self.characters[n].SPD[1]
 		self.characters = sorted(self.characters, key=lambda c: c.ini)
 		self.X = room.X
 		self.Y = room.Y
 		self.roomName = room.name
+		self.message = message
+		self.beaten = 0
 	
 	def __str__(self):
 		rep = f'''Battle in room {self.name}
@@ -20,148 +23,203 @@ characters included:'''
 			rep += f"\n{character.name} at ({character.pos[0]}, {character.pos[1]}) with HP: {character.HP[0]}/{character.HP[1]} and MP: {character.MP[0]}/{character.MP[1]}"
 		return rep
 	
+	def UpdatePlayer(self):
+		for n in range(len(self.characters)):
+			if self.characters[n].name == self.player.name:
+				self.characters[n] == self.player
+	
+	def RerollInitiative(self):
+		for n in range(len(self.characters)):
+			self.characters[n].ini = random.randint(1,20)
+			self.characters[n].ini += self.characters[n].SPD[1]
+		self.characters = sorted(self.characters, key=lambda c: c.ini)
+
 	def Begin(self):
-		if self.End() == 0:
-			for n in range(len(self.characters)):
-				if self.characters[n].name == self.player.name:
-					self.PlayerTurn()
-				else:
-					self.EnemyTurn(n)
+		print("A battle has begun!")
+		while self.beaten == 0:
+			if self.End() == 0:
+				for n in range(len(self.characters)):
+					if self.characters[n].name == self.player.name:
+						self.PlayerTurn()
+					else:
+						self.EnemyTurn(n)
+					self.UpdatePlayer()
+			elif self.End() == 1:
+				print("You died!")
+				break
+			elif self.End() == 2:
+				print("victory!")
+				self.beaten == 1
 	
 	def PlayerTurn(self):
-		MOVE = ("move","m","1")
-		INV = ("inventory","i","2")
-		ATT = ("attack","a","3")
-		print(f'''\n\nYOUR TURN!
-Your status is:
-	HP: {self.player.HP[0]}/{self.player.HP[1]}
-	MP: {self.player.MP[0]}/{self.player.MP[1]}
-	Current Position: ({self.player.pos[0]}, {self.player.pos[1]})
+		QUIT = ('q','quit')
+		playerActions = 2
+		if self.player.MP[1] > self.player.MP[0]:
+			self.player.MP[0] += random.randint(5,15)
+			self.UpdatePlayer()
+		while playerActions > 0:
+			quitted = 0
+			MOVE = ("move","m","1")
+			INV = ("inventory","i","2")
+			ATT = ("attack","a","3")
+			print(f'''\n\nYOUR TURN!
+	Your status is:
+		HP: {self.player.HP[0]}/{self.player.HP[1]}
+		MP: {self.player.MP[0]}/{self.player.MP[1]}
+		Current Position: ({self.player.pos[0]}, {self.player.pos[1]})
 
-Enemy Positions:''')
-		for character in self.characters:
-			if character.name != self.player.name:
-				print(f"\t{character.name} at ({character.pos[0]}, {character.pos[1]})")
-		print('''\nPlease pick an option:
-	1. Move
-	2. Inventory
-	3. Attack''')
-		chosen = input("")
-
-		if chosen in MOVE:
-			self.player.PlayerMove()
+	Enemy Positions:''')
 			for character in self.characters:
-				if character.name == self.player.name:
-					character.pos = self.player.pos
+				if character.name != self.player.name:
+					print(f"\t{character.name} at ({character.pos[0]}, {character.pos[1]})")
+			print('''\nPlease pick an option:
+		1. Move
+		2. Inventory
+		3. Attack
+		
+		*Remember, type 'q' or 'quit' if you change your mind or want to end the turn!''')
+			chosen = input("")
 
-		elif chosen in INV:
-			self.player.Inventory()
+			if chosen in MOVE:
+				self.player.PlayerMove()
+				self.UpdatePlayer()
+				playerActions -= 1
 
-		elif chosen in ATT:
-			SPELL = ('s','spell')
-			WEAPON = ('w','weapon')
-			choosingSpellWep = 1
-			while choosingSpellWep == 1:
-				chosen = input("Are you using a spell or a weapon?\n")
-				if chosen in WEAPON:
-					choosingSpellWep = 0
-					choosingWeapon = 1
-					while choosingWeapon == 1:
-						print('''\nWhat weapon would you like to use?
-		available weapons:''')
-						for n in range(len(self.player.inv)):
+			elif chosen in INV:
+				self.player.Inventory()
+
+			elif chosen in ATT:
+				SPELL = ('s','spell')
+				WEAPON = ('w','weapon')
+				choosingSpellWep = 1
+				while choosingSpellWep == 1:
+					chosen = input("Are you using a spell or a weapon?\n")
+					if chosen.lower() in WEAPON:
+						choosingSpellWep = 0
+						choosingWeapon = 1
+						while choosingWeapon == 1:
+							print('''\nWhat weapon would you like to use?
+			available weapons:''')
+							for n in range(len(self.player.inv)):
+								try:
+									dmg = self.player.inv[n].damage
+								except ValueError:
+									pass
+								else:
+									print(f"{self.player.inv[n].name}: {self.player.inv[n].damage[0]}d{self.player.inv[n].damage[1]} at {self.player.inv[n].range} range")
+							weaponChoice = input("")
+							if weaponChoice.lower() in QUIT:
+								choosingWeapon = 0
+								quitted = 1
+								break
 							try:
-								dmg = self.player.inv[n].damage
+								dmg = self.player.inv[weaponChoice].damage
 							except ValueError:
-								pass
+								print("That wasn't a weapon!")
 							else:
-								print(f"{self.player.inv[n].name}: {self.player.inv[n].damage[0]}d{self.player.inv[n].damage[1]} at {self.player.inv[n].range} range")
-						weaponChoice = input("")
-						try:
-							dmg = self.player.inv[weaponChoice].damage
-						except ValueError:
-							print("That wasn't a weapon!")
-						else:
-							choosingWeapon = 0
-				elif chosen in SPELL:
-					choosingSpell = 1
-					while choosingSpell == 1:
-						print('''\nWhat spell would you like to use?
-	available spells:''')
-						for n in range(len(self.player.spells)):
-							print(f"{self.player.spells[n].name}: {self.player.spells[n].damage[0]}d{self.player.spells.damage[1]} at {self.player.spells[n].range} range")
-						spellChoice = input("")
-						try:
-							dmg = self.player.spells[spellChoice].damage
-						except ValueError:
-							print("That wasn't a spell!")
-						else:
-							choosingSpell = 0
-							choosingEnemy = 1
-							while choosingEnemy == 1:
-								print('''\nWhat enemy are you targeting?
-				available enemies:''')
-								for character in self.characters:
-									if character.name != self.player.name:
-										enemyXDis = abs((self.characters[character].pos[0] - self.player.pos[0])^2)
-										enemyYDis = abs((self.characters[character].pos[1] - self.player.pos[1])^2)
-										enemyDis = math.sqrt(enemyXDis + enemyYDis)
-										if enemyDis <= self.player.inv[weaponChoice].range:
-											print(f"{self.characters[character].name} at ({self.characters[character].pos[0]},{self.characters[character].pos[1]})")
-								enemyChoice = input("")
-								for n in range(len(self.characters)):
-									if self.characters[n].name == enemyChoice:
-										chosenEID = n
-										choosingEnemy = 0
-										break
-									else:
-										print("Enemy not found! Please try again")
-							
-							hitRoll = random.randint(0,20)
-							hitRoll += self.player.GRT
-							if hitRoll > self.characters[chosenEID].EVA:
-								damage = 0
-								for n in range(self.player.inv[weaponChoice].damage[0]):
-									damage += random.randint(1, self.player.inv[weaponChoice].damage[1])
-								if self.player.inv[weaponChoice].range > 3:
-									damage += self.player.PER
-								elif self.player.inv[weaponChoice].range <= 3:
-									damage+= self.player.STR
-								self.characters[chosenEID].HP -= damage
+								choosingWeapon = 0
+					elif chosen.lower() in SPELL:
+						choosingSpell = 1
+						while choosingSpell == 1:
+							print('''\nWhat spell would you like to use?
+		available spells:''')
+							for n in range(len(self.player.spells)):
+								print(f"{self.player.spells[n].name}: {self.player.spells[n].damage[0]}d{self.player.spells.damage[1]} at {self.player.spells[n].range} range")
+							spellChoice = input("")
+							if spellChoice.lower() in QUIT:
+								choosingSpell = 0
+								quitted = 1
+								break
+							try:
+								dmg = self.player.spells[spellChoice].damage
+							except ValueError:
+								print("That wasn't a spell!")
+							else:
+								choosingSpell = 0
+					elif chosen.lower() in QUIT:
+						choosingSpellWep = 0
+						quitted = 1
+						break
+					else:
+						print("That wasn't an option!")
+					if quitted == 0:
+						choosingEnemy = 1
+						while choosingEnemy == 1:
+							print('''\nWhat enemy are you targeting?
+			available enemies:''')
+							for character in self.characters:
+								if character.name != self.player.name:
+									enemyXDis = abs((self.characters[character].pos[0] - self.player.pos[0])^2)
+									enemyYDis = abs((self.characters[character].pos[1] - self.player.pos[1])^2)
+									enemyDis = math.sqrt(enemyXDis + enemyYDis)
+									if enemyDis <= self.player.inv[weaponChoice].range:
+										print(f"{self.characters[character].name} at ({self.characters[character].pos[0]},{self.characters[character].pos[1]})")
+							enemyChoice = input("")
+							for n in range(len(self.characters)):
+								if self.characters[n].name == enemyChoice:
+									chosenEID = n
+									choosingEnemy = 0
+									break
+								else:
+									print("Enemy not found! Please try again")
+						
+						hitRoll = random.randint(0,20)
+						hitRoll += self.player.GRT
+						if hitRoll > self.characters[chosenEID].EVA:
+							damage = 0
+							for n in range(self.player.inv[weaponChoice].damage[0]):
+								damage += random.randint(1, self.player.inv[weaponChoice].damage[1])
+							if self.player.inv[weaponChoice].range > 3:
+								damage += self.player.PER
+							elif self.player.inv[weaponChoice].range <= 3:
+								damage+= self.player.STR
+							self.characters[chosenEID].HP -= damage
+							print(f"You hit! You dealt {damage} damage!")
 
-								if self.characters[chosenEID].HP <1:
-									if self.characters[chosenEID] is not self.player:
-										killed = self.characters[chosenEID].pop()
-										print(f"You have killed {killed.name}!")
+							if self.characters[chosenEID].HP <1:
+								if self.characters[chosenEID] is not self.player:
+									killed = self.characters[chosenEID].pop()
+									print(f"You have killed {killed.name}!")
+					else:
+						print("The attack missed!")
+				playerActions -= 1
+			elif chosen in QUIT:
+				pass
+			else:
+				print("That wasn't na option!")
 	
 	def EnemyTurn(self, enemyID):
-		MOVE = 0
-		ATTACK = 1
-		choice, weapon = enemy.EnemyChoice(self.player)
+		enemyActions = 2
 		enemy = self.characters[enemyID]
-		if choice in MOVE:
-			enemy.EnemyMove(self.player)
-		elif choice in ATTACK:
-			damage = 0
-			for n in range(weapon.damage[0]):
-				damage += random.randint(1, weapon.damage[1])
-			try:
-				enemy.MP[1] -= weapon.cost
-				self.characters[enemyID].MP[1] -= weapon.cost
-			except AttributeError:
-				pass
-			for character in self.characters:
-				if character.name == self.player.name:
-					self.characters.HP[1] -= damage
-			self.player.HP[1] -= damage
+		while enemyActions > 0:
+			MOVE = 0
+			ATTACK = 1
+			choice, weapon = enemy.EnemyChoice(self.player)
+			if choice in MOVE:
+				enemy.EnemyMove(self.player)
+			elif choice in ATTACK:
+				hitRoll = random.randint(1, 20)
+				if hitRoll > self.player.EVA:
+					damage = 0
+					for n in range(weapon.damage[0]):
+						damage += random.randint(1, weapon.damage[1])
+					try:
+						enemy.MP[1] -= weapon.cost
+						self.characters[enemyID].MP[1] -= weapon.cost
+					except AttributeError:
+						pass
+					self.player.HP[1] -= damage
+					self.UpdatePlayer()
+					print(f"The enemy hit! Dealt {damage} damage!")
+				else:
+					print("The enemy missed!")
 
 		
 	def End(self):
 		if self.player.HP[1] < 1:
-			print("you died!")
 			return 1
 		elif len(self.characters) == 1 and self.characters[0] is self.player:
-			print("victory!")
-			return 1
+			self.beaten = 1
+			return 2
 		else:
 			return 0

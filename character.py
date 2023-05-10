@@ -1,7 +1,7 @@
 import random
 import math
 class Character:
-	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, EVA,GRT):
+	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, EVA, GRT):
 		self.name = name
 		self.room = room
 		self.pos = pos
@@ -36,9 +36,10 @@ Current Initiative: {self.ini}'''
 
 
 class Player(Character):
-	def __Init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER):
-		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER)
+	def __Init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, AC, Grit):
+		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER, AC, Grit)
 		self.inv = {}
+		self.spells = {}
 	
 	def __str__(self):
 		rep = super().__str__()
@@ -117,11 +118,11 @@ class Player(Character):
 
 
 class Enemy(Character):
-	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, type, weapons, spells):
-		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER)
-		self.ai = type
+	def __init__(self, name, room, pos, HP, MP, SPD, STR, CON, INT, PER, AC, grit, type, weapons, spells):
+		super().__init__(name, room, pos, HP, MP, SPD, STR, CON, INT, PER, AC, grit)
+		self.type = type
 		self.weapons = weapons
-		self.sells = spells
+		self.spells = spells
 	
 	def __str__(self):
 		rep = super().__str__()
@@ -217,54 +218,54 @@ class Enemy(Character):
 		XDifference = self.pos[0] - player.pos[0]
 		YDifference = self.pos[1] - player.pos[1]
 		Distance = (XDifference)^2 +(YDifference)^2
-		Distance = math.sqrt(Distance)
+		Distance = math.sqrt(abs(Distance))
 		#The Skeleton Guard simply waits to be in range to attack
 		if self.type == 0:
-			if Distance <= self.Weapons[0].range:
-				return 1, self.Weapons[0]
+			if Distance <= self.weapons[0].range:
+				return 1, self.weapons[0]
 			else:
 				return 0, 0
 		#The skeleton Archer will first attack with the dagger, otherwise it'll either move or attack with a bow
 		elif self.type == 1:
-			if Distance <= self.Weapons[1].range:
-				return 1, self.Weapons[1]
+			if Distance <= self.weapons[1].range:
+				return 1, self.weapons[1]
 			else:
 				choice = random.randint(0,1)
 				if choice == 1:
-					return 1, self.Weapons[0]
+					return 1, self.weapons[0]
 				else:
 					return 0, 0
 		
 		elif self.type == 2:
-			if Distance <= self.Weapons[0].range:
-				return 1, self.Weapons[0]
+			if Distance <= self.weapons[0].range:
+				return 1, self.weapons[0]
 			else:
 				return 0,0
 
 		elif self.type == 3:
-			if Distance <= self.Weapons[0].range:
-				return 1, self.Weapons[0]
+			if Distance <= self.weapons[0].range:
+				return 1, self.weapons[0]
 			else:
 				return 0,0
 		
 		elif self.type == 4:
-			if Distance <= self.Weapons[0].range:
-				return 1, self.Weapons[0]
+			if Distance <= self.weapons[0].range:
+				return 1, self.weapons[0]
 			else:
 				return 0,0
 		#the enchanted sword swipes in to kill before backing off to fire a single beam. Then it resumes
 		elif self.type == 5:
 			if hasAttacked == 1:
-				if Distance <= self.Weapons[0].range:
+				if Distance <= self.weapons[0].range:
 					hasAttacked = 1
-					return 1, self.Weapons[0]
+					return 1, self.weapons[0]
 				else:
 					return 0,0
 			else:
 				if self.MP[1] <= 10:
-					if Distance <= self.Weapons[0].range:
+					if Distance <= self.weapons[0].range:
 						hasAttacked = 0
-						return 1, self.Weapons[0]
+						return 1, self.weapons[0]
 					else:
 						return 0,0
 				else:

@@ -2,6 +2,7 @@ import random
 import character
 import rooms
 import items
+import battle
 
 Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6,16,3)
 #generate default player inventory
@@ -12,7 +13,11 @@ Player.inv["HPotion"] = items.Consumable("HPotion",5,0)
 Player.inv["Mpotion"] = items.Consumable("MPotion",5,1)
 Player.inv["CONPotion"] = items.Consumable("CONPotion",1,2)
 
-#generate rooms
+#generate player spells
+Player.spells = {}
+Player.spells["Fire Bolt"] = items.Spell("Fire Bolt",[2,8],6,15)
+Player.spells["Thunder Ray"] = items.Spell("Thunder Ray",[2,6],3,10)
+
 ROOMS = {}
 ROOMS["West Wall"] = rooms.Room("West Wall",[-1, 3],[-11,5],"A large wall that sprawls for miles stands beore you. It's crooked, mossy bricks barely held together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work.")
 ROOMS["North Wall"] = rooms.Room("North Wall",[-5,5],[-2,2],"The wall makes a sharp 90 degree turn and you see a large pile of rubble. At the top, a single door that you couldn't hope of reaching this low.")
@@ -68,46 +73,63 @@ PORTALKEYS = list(PORTALS.keys())
 #generate enemies
 enemies = []
 for n in range(random.randint(1,3)):
-	enemies.append(character.Enemy(f"SkeletonGuard{n}","Courtyard 1",[random.randint(-12, 10),random.randint(-5,5)],30,20,3,5,6,4,5,12,2,0, [items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonGuard{n}",ROOMS["Courtyard 1"],[random.randint(-12, 10),random.randint(-5,5)],30,20,3,5,6,4,5,12,2,0, [items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
 
 for n in range(random.randint(1,3)):
-	enemies.append(character.Enemy(f"SkeletonGuard{n}","Courtyard 2",[random.randint(-6, 8),random.randint(-6, 8)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonGuard{n}",ROOMS["Courtyard 2"],[random.randint(-6, 8),random.randint(-6, 8)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
 for n in range(random.randint(0,2)):
-	enemies.append(character.Enemy(f"SkeletonArcher{n}","Courtyard 2",[random.randint(-6, 8),random.randint(-6, 8)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonArcher{n}",ROOMS["Courtyard 2"],[random.randint(-6, 8),random.randint(-6, 8)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
 
 for n in range(random.randint(0,2)):
-	enemies.append(character.Enemy(f"SkeletonGuard{n}","Break Room",[random.randint(-5, 5),random.randint(-5, 5)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonGuard{n}",ROOMS["Break Room"],[random.randint(-5, 5),random.randint(-5, 5)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
 for n in range(random.randint(0,1)):
-	enemies.append(character.Enemy(f"SkeletonArcher{n}","Break Room",[random.randint(-5, 5),random.randint(-5, 5)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonArcher{n}",ROOMS["Break Room"],[random.randint(-5, 5),random.randint(-5, 5)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
 for n in range(random.randint(0,1)):
-	enemies.append(character.Enemy(f"Spider{n}","Break Room",[random.randint(-5, 5),random.randint(-5, 5)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
+	enemies.append(character.Enemy(f"Spider{n}",ROOMS["Break Room"],[random.randint(-5, 5),random.randint(-5, 5)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
 
 for n in range(random.randint(0,3)):
-	enemies.append(character.Enemy(f"Spider{n}","Basement",[random.randint(-4, 5),random.randint(-3, 4)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
+	enemies.append(character.Enemy(f"Spider{n}",ROOMS["Basement"],[random.randint(-4, 5),random.randint(-3, 4)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
 for n in range(random.randint(0,2)):
-	enemies.append(character.Enemy(f"SkeletonArcher{n}","Basement",[random.randint(-4, 5),random.randint(-3, 4)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
-enemies.append(character.Enemy("GiantZombieBat","Basement",[random.randint(-4,5),random.randint(-3,4)],60,30,5,8,8,4,6,14,3,3,[items.Weapon("ZombBatDmg",1,(4,8),6),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonArcher{n}",ROOMS["Basement"],[random.randint(-4, 5),random.randint(-3, 4)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
+enemies.append(character.Enemy("GiantZombieBat",ROOMS["Basement"],[random.randint(-4,5),random.randint(-3,4)],60,30,5,8,8,4,6,14,3,3,[items.Weapon("ZombBatDmg",1,(4,8),6),0],[0,0]))
 
 for n in range(random.randint(1,3)):
-	enemies.append(character.Enemy(f"SkeletonGuard{n}","Castle Hall 1",[random.randint(-6, 7),random.randint(-14, 14)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonGuard{n}",ROOMS["Castle Hall 1"],[random.randint(-6, 7),random.randint(-14, 14)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
 for n in range(random.randint(1,3)):
-	enemies.append(character.Enemy(f"SkeletonArcher{n}","Castle Hall 1",[random.randint(-6, 7),random.randint(-14, 14)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonArcher{n}",ROOMS["Castle Hall 1"],[random.randint(-6, 7),random.randint(-14, 14)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
 for n in range(random.randint(0,1)):
-	enemies.append(character.Enemy(f"Spider{n}","Castle Hall 1",[random.randint(-6, 7),random.randint(-14, 14)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
-enemies.append(character.Enemy(f"PossessedArmor{n}","Castle Hall 1",[random.randint(-6,7),random.randint(-14,14)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),2),0],[items.Spell("ArmorBeam",(1,6),5,10),0]))
+	enemies.append(character.Enemy(f"Spider{n}",ROOMS["Castle Hall 1"],[random.randint(-6, 7),random.randint(-14, 14)],40,0,2,7,5,1,3,8,1,2,[items.Weapon("SpiderFang",1,(5,6),1),0],[0,0]))
+enemies.append(character.Enemy(f"PossessedArmor{n}",ROOMS["Castle Hall 1"],[random.randint(-6,7),random.randint(-14,14)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),2),0],[items.Spell("ArmorBeam",(1,6),5,10),0]))
 
 for n in range(random.randint(1,3)):
-	enemies.append(character.Enemy(f"SkeletonArcher{n}","Castle Hall 2",[random.randint(-6, 6),random.randint(-6, 6)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonArcher{n}",ROOMS["Castle Hall 2"],[random.randint(-6, 6),random.randint(-6, 6)],20,30,4,3,6,5,6,14,2,1,[items.Weapon("SkeleBow",1,(3,6),15),items.Weapon("SkeleDagg",1,(2,6),3)],[0,0]))
 for n in range(random.randint(0,2)):
-	enemies.append(character.Enemy(f"SkeletonGuard{n}","Castle Hall 2",[random.randint(-6, 6),random.randint(-6, 6)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
+	enemies.append(character.Enemy(f"SkeletonGuard{n}",ROOMS["Castle Hall 2"],[random.randint(-6, 6),random.randint(-6, 6)],30,20,3,5,6,4,5,12,2,0,[items.Weapon("SkeleSword", 1, (2,6), 3),0],[0,0]))
 for n in range(random.randint(1,2)):
-	enemies.append(character.Enemy(f"PossessedArmor{n}","Castle Hall 2",[random.randint(-6,6),random.randint(-6,6)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),3),0],[items.Spell("ArmorBeam",(1,6),5,10),0]))
+	enemies.append(character.Enemy(f"PossessedArmor{n}",ROOMS["Castle Hall 2"],[random.randint(-6,6),random.randint(-6,6)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),3),0],[items.Spell("ArmorBeam",(1,6),5,10),0]))
 
 for n in range(random.randint(1,2)):
-	enemies.append(f"EnchantedSword{n}","Throne Room",[random.randint(-9,9),random.randint(-7,8)],30,45,5,5,4,7,4,16,2,5,[items.Weapon("SwordSlash",1,(6,4),2),0],[items.Spell("SwrdBeam",(2,5),5,15),0])
+	enemies.append(character.Enemy(f"EnchantedSword{n}",ROOMS["Throne Room"],[random.randint(-9,9),random.randint(-7,8)],30,45,5,5,4,7,4,16,2,5,[items.Weapon("SwordSlash",1,(6,4),2),0],[items.Spell("SwrdBeam",(2,5),5,15),0]))
 for n in range(random.randint(1,2)):
-	enemies.append(character.Enemy(f"PossessedArmor{n}","Throne Room",[random.randint(-9,9),random.randint(-7,8)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),3),0],[items.Spell("ArmorBeam",(1,6),5,10)]))
-enemies.append(character.Enemy("LichKing","Throne Room",[0,5],40,60,6,3,6,7,5,6,[0,0],[items.Spell("SkullRay",(3,6),10,20),items.Spell("?",(0,0),0,0)]))
+	enemies.append(character.Enemy(f"PossessedArmor{n}",ROOMS["Throne Room"],[random.randint(-9,9),random.randint(-7,8)],40,40,3,6,4,6,3,10,2,4,[items.Weapon("ArmorBash",1,(3,4),3),0],[items.Spell("ArmorBeam",(1,6),5,10)]))
+enemies.append(character.Enemy("Lich King",ROOMS["Throne Room"],[random.randint(-9,9),random.randint(-7,8)],40,60,6,3,6,7,5,14,2,4,[items.Weapon("ArmorBash",1,(3,4),3),0],[items.Spell("ArmorBeam",(1,6),5,10)]))
+#40,60,6,3,6,7,5,6
+
+#generate battles
+BATTLES = {}
+BATTLES["Courtyard 1"] = battle.Battle(Player,[],ROOMS["Courtyard 1"],"As you walk around the courtyard you see many patrolling skeletons that seem to have spotted you")
+BATTLES["Courtyard 2"] = battle.Battle(Player,[],ROOMS["Courtyard 2"],"Going through these courtyards, more skeletons see you and begin battle")
+BATTLES["Break Room"] = battle.Battle(Player,[],ROOMS["Break Room"],"Walking into the room you see multiple skeletons playing cards. They look less than amused at your presence.")
+BATTLES["Basement"] = battle.Battle(Player,[],ROOMS["Basement"],"In the middle of the dark basement lies a gigantic writhing creature of which you cannot make out any details.")
+BATTLES["Castle Hall 1"] = battle.Battle(Player,[],ROOMS["Castle Hall 1"],"Within the sprawling halls of the castle many guards seem to have spotted you")
+BATTLES["Castle Hall 2"] = battle.Battle(Player,[],ROOMS["Castle Hall 2"],"There are many skeletons inside this room, all previously preoccupied with their own matters. Of course, you are now their priority")
+BATTLES["Throne Room"] = battle.Battle(Player,[],ROOMS["Throne Room"],"On top of the throne at the peak of the room lies the evil of which you have been sent to destroy. His groans increasingly become louder as he lifts his body off of his throne. Time to fight.")
+BATTLEKEYS = list(BATTLES.keys())
+for n in range(len(BATTLEKEYS)):
+	for enemy in enemies:
+		if enemy.room.name == BATTLEKEYS[n]:
+			BATTLES[BATTLEKEYS[n]].characters.append(enemy)
+	BATTLES[BATTLEKEYS[n]].RerollInitiative()
 
 #generate pickups
 pickups = []
@@ -141,6 +163,12 @@ while inGame == 1:
 		inGame = 0
 		print("Thank you for playing!")
 		break
+
+	for n in range(len(BATTLEKEYS)):
+		if ROOMS[Player.room].name == ROOMS[BATTLES[BATTLEKEYS[n]].roomName].name:
+			battleTime = BATTLES[BATTLEKEYS[n]]
+			print(battleTime.message)
+			battleTime.Begin()
 
 	availablePortals = []
 	for key in PORTALS:
