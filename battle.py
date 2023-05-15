@@ -38,11 +38,14 @@ characters included:'''
 		print("A battle has begun!")
 		while self.beaten == 0:
 			if self.End() == 0:
-				for n in range(len(self.characters)):
-					if self.characters[n].name == self.player.name:
+				for turn in range(len(self.characters)):
+					if self.End() != 0:
+						break
+					if self.characters[turn].name == self.player.name:
 						self.PlayerTurn()
 					else:
-						self.EnemyTurn(n)
+						if self.characters[turn].activated == 1:
+							self.EnemyTurn(turn)
 					self.UpdatePlayer()
 			elif self.End() == 1:
 				print("You died!")
@@ -71,8 +74,9 @@ Your status is:
 	Enemy Positions:''')
 			for n in range(len(self.characters)):
 				if self.characters[n].name != self.player.name:
-					distance = math.dist(self.player.pos, self.characters[n].pos)
-					print(f"\t{self.characters[n].name} at ({self.characters[n].pos[0]}, {self.characters[n].pos[1]}), Distance of {distance:.2f}")
+					if self.characters[n].activated == 1:
+						distance = math.dist(self.player.pos, self.characters[n].pos)
+						print(f"\t{self.characters[n].name} at ({self.characters[n].pos[0]}, {self.characters[n].pos[1]}), Distance of {distance:.2f}")
 			print('''\nPlease pick an option:
 		1. Move
 		2. Inventory
@@ -120,6 +124,7 @@ Your status is:
 							else:
 								choosingWeapon = 0
 					elif chosen.lower() in SPELL:
+						choosingSpellWep = 0
 						choosingSpell = 1
 						while choosingSpell == 1:
 							print('''\nWhat spell would you like to use?
@@ -133,32 +138,31 @@ Your status is:
 								break
 							try:
 								dmg = self.player.spells[spellChoice].damage
-							except ValueError:
+							except KeyError:
 								print("That wasn't a spell!")
 							else:
 								choosingSpell = 0
 					elif chosen.lower() in QUIT:
-						choosingSpellWep = 0
 						quitted = 1
 						break
 					else:
 						print("That wasn't an option!")
-					if quitted == 0:
+					if quitted == 0 and choosingSpellWep == 0:
 						choosingEnemy = 1
 						while choosingEnemy == 1:
 							print('''\nWhat enemy are you targeting?
+(only prints enemies that are in range)
 available enemies:''')
 							for n in range(len(self.characters)):
 								if self.characters[n].name != self.player.name:
-									enemyXDis = abs((self.characters[n].pos[0] - self.player.pos[0])^2)
-									enemyYDis = abs((self.characters[n].pos[1] - self.player.pos[1])^2)
-									enemyDis = math.sqrt(enemyXDis + enemyYDis)
-									try:
-										if enemyDis <= self.player.inv[weaponChoice].range:
-											print(f"{self.characters[n].name} at ({self.characters[n].pos[0]},{self.characters[n].pos[1]}), Distance of {enemyDis:.2f}")
-									except UnboundLocalError:
-										if enemyDis <= self.player.spells[spellChoice].range:
-											print(f"{self.characters[n].name} at ({self.characters[n].pos[0]},{self.characters[n].pos[1]}), Distance of {enemyDis:.2f}")
+									if self.characters[n].activated == 1:
+										enemyDis = math.dist(self.player.pos, self.characters[n].pos)
+										try:
+											if enemyDis <= self.player.inv[weaponChoice].range:
+												print(f"{self.characters[n].name} at ({self.characters[n].pos[0]},{self.characters[n].pos[1]}), Distance of {enemyDis:.2f}")
+										except UnboundLocalError:
+											if enemyDis <= self.player.spells[spellChoice].range:
+												print(f"{self.characters[n].name} at ({self.characters[n].pos[0]},{self.characters[n].pos[1]}), Distance of {enemyDis:.2f}")
 							enemyChoice = input("")
 							if enemyChoice in QUIT:
 								choosingEnemy = 0
@@ -166,9 +170,7 @@ available enemies:''')
 								break
 							for n in range(len(self.characters)):
 								if self.characters[n].name.lower() == enemyChoice.lower():
-									enemyXDis = abs((self.characters[n].pos[0] - self.player.pos[0])^2)
-									enemyYDis = abs((self.characters[n].pos[1] - self.player.pos[1])^2)
-									enemyDis = math.sqrt(enemyXDis + enemyYDis)
+									enemyDis = math.dist(self.player.pos, self.characters[n].pos)
 									inRange = 1
 									try:
 										if enemyDis > self.player.inv[weaponChoice].range:
@@ -209,11 +211,12 @@ available enemies:''')
 
 								if self.characters[chosenEID].HP[0] <1:
 									if self.characters[chosenEID] is not self.player:
-										killed = self.characters.pop(chosenEID)
-										print(f"You have killed {killed.name}!")
+										print(f"You have killed {self.characters[chosenEID].name}!")
+										self.characters[chosenEID].activated = 0
 					else:
 						print("The attack missed!")
-				playerActions -= 1
+				if quitted == 0:
+					playerActions -= 1
 			elif chosen in QUIT:
 				playerActions = 0
 				print("You ended your turn!")
@@ -229,6 +232,7 @@ available enemies:''')
 			choice, weapon = enemy.EnemyChoice(self.player)
 			if choice == MOVE:
 				enemy.EnemyMove(self.player)
+				print(f"{enemy.name} has moved to ({enemy.pos[0]}, {enemy.pos[1]})")
 			elif choice == ATTACK:
 				hitRoll = random.randint(1, 20)
 				if hitRoll > self.player.EVA:
@@ -242,17 +246,24 @@ available enemies:''')
 						pass
 					self.player.HP[1] -= damage
 					self.UpdatePlayer()
-					print(f"The enemy hit! Dealt {damage} damage!")
+					print(f"{enemy.name} hit! Dealt {damage} damage!")
 				else:
-					print("The enemy missed!")
+					print(f"{enemy.name} missed!")
 			enemyActions -= 1
 
 		
 	def End(self):
+		killed = 0
+		for n in range(len(self.characters)):
+			try:
+				if self.characters[n].activated == 0:
+					killed += 1
+			except AttributeError:
+				pass
+			if killed == (len(self.characters) - 1):
+				self.beaten = 1
+				return 2
 		if self.player.HP[1] < 1:
 			return 1
-		elif len(self.characters) == 1 and self.characters[0] is self.player:
-			self.beaten = 1
-			return 2
 		else:
 			return 0

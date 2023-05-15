@@ -7,16 +7,16 @@ import battle
 Player = character.Player("placeholder","West Wall",[0,0],100,100,6,6,5,6,6,10,3)
 #generate default player inventory
 Player.inv = {}
-Player.inv["Broadword"] = items.Weapon("Broadword",1,[3,6],2)
-Player.inv["Crossbow"] = items.Weapon("Crossbow",1,[4,4],10)
+Player.inv["Broadsword"] = items.Weapon("Broadsword",1,[4,6],4)
+Player.inv["Crossbow"] = items.Weapon("Crossbow",1,[2,6],10)
 Player.inv["HPotion"] = items.Consumable("HPotion",5,0)
 Player.inv["Mpotion"] = items.Consumable("MPotion",5,1)
 Player.inv["CONPotion"] = items.Consumable("CONPotion",1,2)
 
 #generate player spells
 Player.spells = {}
-Player.spells["Fire Bolt"] = items.Spell("Fire Bolt",[2,8],6,15)
-Player.spells["Thunder Ray"] = items.Spell("Thunder Ray",[2,6],3,10)
+Player.spells["Fire Bolt"] = items.Spell("Fire Bolt",[2,6],6,15)
+Player.spells["Thunder Ray"] = items.Spell("Thunder Ray",[3,8],3,10)
 
 ROOMS = {}
 ROOMS["West Wall"] = rooms.Room("West Wall",[-1, 3],[-11,5],"A large wall that sprawls for miles stands beore you. It's crooked, mossy bricks barely held together feel like they're going to break. Beyond the wall you see what looks like a large castle, something that once might've belonged to a king, but now lays decrepit and dead. But through it you see horrible new life. A large beam of light rises from the center of it all, peircing the heavens with it's demonic glow. This is why you have been sent here with your two fellow mercenaries. Within lies a lich king, a horrible monstrosity capable of reanimating the dead. The king from yonder kingdom is afraid of the lich king's presence, and has hired you to exterminate him with the aid of two other swords-for-hire. You've better get to work.")

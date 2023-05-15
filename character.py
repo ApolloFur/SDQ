@@ -123,10 +123,11 @@ class Enemy(Character):
 		self.type = type
 		self.weapons = weapons
 		self.spells = spells
+		self.activated = 1
 	
 	def __str__(self):
 		rep = super().__str__()
-		rep += f'\nAI type: {self.ai}'
+		rep += f'\nAI type: {self.type}'
 	
 	def EnemyMove(self, player):
 		#The skeleton guard flails in a rough direction at the player
@@ -215,10 +216,7 @@ class Enemy(Character):
 		self.Move(XAmount, YAmount)
 	
 	def EnemyChoice(self, player):
-		XDifference = self.pos[0] - player.pos[0]
-		YDifference = self.pos[1] - player.pos[1]
-		Distance = (XDifference)^2 +(YDifference)^2
-		Distance = math.sqrt(abs(Distance))
+		Distance = math.dist(self.pos, player.pos)
 		#The Skeleton Guard simply waits to be in range to attack
 		if self.type == 0:
 			if Distance <= self.weapons[0].range:
